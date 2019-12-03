@@ -19,10 +19,10 @@ router.post("/register", (req, res) => {
       user.password = hash;
       try {
         const newUser = await user.save();
-        res.status(201);
+        res.status(201).send();
       } catch (error) {
         console.log(err);
-        res.status(500);
+        res.status(500).sendFile();
       }
     });
   });
@@ -44,7 +44,7 @@ router.post("/auth", async (req, res) => {
     const { iat, exp } = jwt.decode(token);
     res.send({ iat, exp, token });
   } catch (err) {
-    res.status(401);
+    res.status(401).send();
   }
 });
 

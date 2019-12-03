@@ -3,16 +3,33 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const config = require("./config");
+const ejwt = require("express-jwt");
+const tasks = require("./server/routes/api/tasks");
+const users = require("./server/routes/api/users");
 
 const app = express();
 
 //middleware
 
+app.use(
+  ejwt({ secret: config.JWT_SECRET }).unless({
+    path: ["/user/auth", "/user/register"]
+  })
+);
+
 app.use(bodyParser.json());
 app.use(cors());
 
-const tasks = require("./server/routes/api/tasks");
+app.use("/user", users);
 app.use("/api/tasks", tasks);
+
+app.use((err, req, res, next) => {
+  if (err.name === "UnauthorizedError") {
+    res
+      .status(401)
+      .send({ message: "No token was found or token date is expired" });
+  }
+});
 
 const port = config.PORT;
 app.listen(port, async () => {
