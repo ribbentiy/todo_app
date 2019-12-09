@@ -44,7 +44,7 @@ router.post("/auth", async (req, res) => {
     const { iat, exp } = jwt.decode(token);
     res.send({ iat, exp, token });
   } catch (err) {
-    res.status(401).send();
+    res.status(401).send({ message: err });
   }
 });
 

@@ -18,6 +18,10 @@ const TaskSchema = new mongoose.Schema({
   expDate: {
     type: Date,
     default: new Date(Date.now() + 1209600000)
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
   }
 });
 

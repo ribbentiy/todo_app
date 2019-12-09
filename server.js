@@ -12,11 +12,18 @@ const app = express();
 //middleware
 
 app.use(
-  ejwt({ secret: config.JWT_SECRET }).unless({
+  ejwt({
+    secret: config.JWT_SECRET
+  }).unless({
     path: ["/user/auth", "/user/register"]
   })
 );
 
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+);
 app.use(bodyParser.json());
 app.use(cors());
 

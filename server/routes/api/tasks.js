@@ -7,7 +7,9 @@ const Task = require("../../models/Task");
 
 router.get("/", async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const tasks = await Task.find().populate({
+      path: "user"
+    });
     res.send(tasks);
   } catch (err) {
     console.log(err);
@@ -19,7 +21,8 @@ router.get("/", async (req, res) => {
 //Public
 router.get("/:id", async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(req.params.id).populate({ path: "user" });
+
     res.send(task);
   } catch (err) {
     console.log(err);
@@ -31,12 +34,14 @@ router.get("/:id", async (req, res) => {
 //Public
 router.post("/", async (req, res) => {
   const { title, message = "", isDone, expDate } = req.body;
+  const user = req.user._id;
   try {
     const newTask = new Task({
       title,
       message,
       isDone,
-      expDate
+      expDate,
+      user
     });
     await newTask.save();
     res.status(201).send(newTask);
