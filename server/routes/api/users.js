@@ -38,7 +38,7 @@ router.post("/auth", async (req, res) => {
 
     //Create JWt
     const token = jwt.sign(user.toJSON(), config.JWT_SECRET, {
-      expiresIn: "24h"
+      expiresIn: "365d"
     });
 
     const { iat, exp } = jwt.decode(token);

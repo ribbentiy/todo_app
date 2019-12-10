@@ -17,7 +17,19 @@ const UserSchema = mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  firstName: {
+    type: String
+  },
+  lastName: {
+    type: String
   }
+  // groups: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: "Group"
+  //   }
+  // ]
 });
 
 const User = mongoose.model("User", UserSchema);

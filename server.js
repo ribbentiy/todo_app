@@ -6,6 +6,7 @@ const config = require("./config");
 const ejwt = require("express-jwt");
 const tasks = require("./server/routes/api/tasks");
 const users = require("./server/routes/api/users");
+const desks = require("./server/routes/api/desks");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(cors());
 
 app.use("/user", users);
 app.use("/api/tasks", tasks);
+app.use("/api/desks", desks);
 
 app.use((err, req, res, next) => {
   if (err.name === "UnauthorizedError") {

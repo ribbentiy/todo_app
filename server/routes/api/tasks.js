@@ -7,13 +7,15 @@ const Task = require("../../models/Task");
 
 router.get("/", async (req, res) => {
   try {
-    const tasks = await Task.find().populate({
-      path: "user"
+    //const query = req.query;
+    const tasks = await Task.find({ user: req.user._id }).populate({
+      path: "user",
+      select: "-password"
     });
+
     res.send(tasks);
   } catch (err) {
-    console.log(err);
-    res.status(500).send();
+    res.status(500).send(err);
   }
 });
 
@@ -21,7 +23,10 @@ router.get("/", async (req, res) => {
 //Public
 router.get("/:id", async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id).populate({ path: "user" });
+    const task = await Task.findById(req.params.id).populate({
+      path: "user",
+      select: "-password"
+    });
 
     res.send(task);
   } catch (err) {
