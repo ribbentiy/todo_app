@@ -1,5 +1,5 @@
 <template>
-  <button>
+  <button @click="$emit('user-click')" @keyup.space="$emit('user-click')">
     <slot></slot>
   </button>
 </template>

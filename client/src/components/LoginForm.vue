@@ -1,6 +1,6 @@
 <template>
   <div class="login-form">
-    <form @submit.prevent="validateForm" novalidate>
+    <form novalidate>
       <div class="errors" v-if="!(errors.length === 0)">
         <b>Following errors have been occured:</b>
         <ul>
@@ -39,10 +39,7 @@
           />
         </div>
       </fieldset>
-      <BaseButton
-        @click.prevent="submit"
-        @keyup.enter="submit"
-      >{{ isSigningIn ? "LogIn" : "SignUp" }}</BaseButton>
+      <BaseButton @user-click="validateForm">{{ isSigningIn ? "LogIn" : "SignUp" }}</BaseButton>
     </form>
   </div>
 </template>
