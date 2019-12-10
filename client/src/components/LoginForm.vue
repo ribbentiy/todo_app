@@ -8,7 +8,8 @@
         </ul>
       </div>
       <fieldset>
-        <label for="login-email">Email: </label><br />
+        <label for="login-email">Email:</label>
+        <br />
         <input
           type="email"
           id="login-email"
@@ -18,7 +19,8 @@
         />
       </fieldset>
       <fieldset>
-        <label for="login-password">Password:</label><br />
+        <label for="login-password">Password:</label>
+        <br />
         <input
           type="password"
           id="login-password"
@@ -27,7 +29,8 @@
           title="Please fill the password field"
         />
         <div v-if="!isSigningIn">
-          <label for="login-confirm">Confirm password:</label><br />
+          <label for="login-confirm">Confirm password:</label>
+          <br />
           <input
             type="password"
             v-model="confirmPassword"
@@ -36,9 +39,10 @@
           />
         </div>
       </fieldset>
-      <BaseButton @click.prevent="submit" @keyup.enter="submit">
-        {{ isSigningIn ? "LogIn" : "SignUp" }}
-      </BaseButton>
+      <BaseButton
+        @click.prevent="submit"
+        @keyup.enter="submit"
+      >{{ isSigningIn ? "LogIn" : "SignUp" }}</BaseButton>
     </form>
   </div>
 </template>
@@ -78,7 +82,13 @@ export default {
         this.errors.push("Password and confirmation must be the same");
       }
       if (this.errors.length === 0) {
-        console.log("well done!");
+        const user = { email: this.email, password: this.password };
+        if (this.isSigningIn) {
+          this.$store.dispatch("user/authUser", user);
+        } else {
+          this.$store.dispatch("user/registerUser", user);
+        }
+        this.$router.push("/");
       }
     }
   }

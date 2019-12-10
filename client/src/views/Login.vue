@@ -9,7 +9,7 @@
         v-model="isSigningIn"
         @change="!isSigningIn"
       />
-      <Label for="hasAccount">Уже есть аккаунт</Label>
+      <label for="hasAccount">Уже есть аккаунт</label>
     </div>
   </div>
 </template>

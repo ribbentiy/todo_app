@@ -16,7 +16,7 @@ app.use(
   ejwt({
     secret: config.JWT_SECRET
   }).unless({
-    path: ["/user/auth", "/user/register"]
+    path: ["/api/user/auth", "/api/user/register"]
   })
 );
 
@@ -28,7 +28,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use("/user", users);
+app.use("/api/user", users);
 app.use("/api/tasks", tasks);
 app.use("/api/desks", desks);
 
