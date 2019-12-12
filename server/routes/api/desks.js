@@ -7,9 +7,11 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const desks = await Desk.find({ user: req.user._id }).populate({
+    const desks = await Desk.find({
+      user: req.user._id
+    }).populate({
       path: "tasks",
-      select: "-user"
+      select: "-user -desk"
     });
     res.send(desks);
   } catch (err) {
@@ -26,7 +28,7 @@ router.get("/:id", async (req, res) => {
       _id: req.params.id
     }).populate({
       path: "tasks",
-      select: "-user"
+      select: "-user -desk"
     });
     res.send(desk);
   } catch (err) {
@@ -62,7 +64,10 @@ router.put("/:id", async (req, res) => {
       { new: true }
     ).populate({
       path: "tasks",
-      select: "-user"
+      select: {
+        user: 0,
+        desk: 0
+      }
     });
 
     res.send(desk);

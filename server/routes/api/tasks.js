@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Task = require("../../models/Task");
+//const mongoose = require("mongoose");
+const Desk = require("../../models/Desk");
 
 //Get all Tasks
 //Public
@@ -8,10 +10,7 @@ const Task = require("../../models/Task");
 router.get("/", async (req, res) => {
   try {
     //const query = req.query;
-    const tasks = await Task.find({ user: req.user._id }).populate({
-      path: "user",
-      select: "-password"
-    });
+    const tasks = await Task.find({ user: req.user._id });
 
     res.send(tasks);
   } catch (err) {
@@ -23,10 +22,7 @@ router.get("/", async (req, res) => {
 //Public
 router.get("/:id", async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id).populate({
-      path: "user",
-      select: "-password"
-    });
+    const task = await Task.findById(req.params.id);
 
     res.send(task);
   } catch (err) {
@@ -38,7 +34,7 @@ router.get("/:id", async (req, res) => {
 //Create a Task
 //Public
 router.post("/", async (req, res) => {
-  const { title, message = "", isDone, expDate } = req.body;
+  const { title, message = "", isDone, expDate, desk } = req.body;
   const user = req.user._id;
   try {
     const newTask = new Task({
@@ -46,9 +42,13 @@ router.post("/", async (req, res) => {
       message,
       isDone,
       expDate,
-      user
+      user,
+      desk
     });
     await newTask.save();
+    const findDesk = await Desk.findOne({ _id: desk });
+    findDesk.tasks.push(newTask._id);
+    findDesk.save();
     res.status(201).send(newTask);
   } catch (err) {
     console.log(err);
@@ -60,10 +60,24 @@ router.post("/", async (req, res) => {
 //Public
 router.put("/:id", async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+    const task = await Task.findOne({
+      user: req.user._id,
+      _id: req.params.id
+    });
+    if (req.body.desk) {
+      const prevDeskId = task.desk;
+      const newDeskId = req.body.desk;
+      let prevDesk = await Desk.findById(prevDeskId);
+      prevDesk.tasks = prevDesk.tasks.filter(el => el._id != task._id);
+      await prevDesk.save();
+      let newDesk = await Desk.findById(newDeskId);
+      newDesk.tasks.push(task._id);
+      await newDesk.save();
+    }
+    const updatedTask = await Task.findByIdAndUpdate(task._id, req.body, {
       new: true
     });
-    res.status(200).send(task);
+    res.status(200).send(updatedTask);
   } catch (err) {
     console.log(err);
     res.status(404).send(`Content with id ${req.params.id} not found`);
@@ -74,7 +88,16 @@ router.put("/:id", async (req, res) => {
 //Public
 router.delete("/:id", async (req, res) => {
   try {
-    await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findOne({
+      user: req.user._id,
+      _id: req.params.id
+    });
+    const taskId = task._id;
+    const deskId = task.desk;
+    await Task.findByIdAndDelete(taskId);
+    let desk = await Desk.findById(deskId);
+    desk.tasks = [];
+    await desk.save();
     res.status(204).send();
   } catch (err) {
     console.log(err);

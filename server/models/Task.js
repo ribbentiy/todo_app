@@ -21,8 +21,14 @@ const TaskSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    ref: "User",
+    required: true
+  },
+  desk: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Desk"
   }
+
   // group: {
   //   type: mongoose.Schema.Types.ObjectId,
   //   ref: "Group"
