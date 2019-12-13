@@ -31,8 +31,8 @@ export default {
 .card {
   width: 200px;
   height: 500px;
-  background-color: lightcoral;
-  border: 2px solid coral;
+  background-color: rgb(204, 204, 204);
+  border: 2px solid rgb(104, 104, 104);
   border-radius: 10px;
 }
 </style>
