@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Task = require("../../models/Task");
-//const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 const Desk = require("../../models/Desk");
 
 //Get all Tasks
@@ -68,7 +68,7 @@ router.put("/:id", async (req, res) => {
       const prevDeskId = task.desk;
       const newDeskId = req.body.desk;
       let prevDesk = await Desk.findById(prevDeskId);
-      prevDesk.tasks = prevDesk.tasks.filter(el => el._id != task._id);
+      prevDesk.tasks.splice(prevDesk.tasks.indexOf(task._id), 1);
       await prevDesk.save();
       let newDesk = await Desk.findById(newDeskId);
       newDesk.tasks.push(task._id);
@@ -94,10 +94,10 @@ router.delete("/:id", async (req, res) => {
     });
     const taskId = task._id;
     const deskId = task.desk;
-    await Task.findByIdAndDelete(taskId);
     let desk = await Desk.findById(deskId);
-    desk.tasks = [];
+    desk.tasks.splice(desk.tasks.indexOf(taskId), 1);
     await desk.save();
+    await Task.findByIdAndDelete(taskId);
     res.status(204).send();
   } catch (err) {
     console.log(err);
