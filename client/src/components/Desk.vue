@@ -2,6 +2,11 @@
   <div class="card">
     <div class="desk">
       {{ desk.title }}
+      <ul>
+        <li v-for="task in desk.tasks" :key="task._id">
+          {{ `title: ${task.title} -- message: ${task.message}` }}
+        </li>
+      </ul>
       <BaseButton @user-click="delDesk(desk._id)">Delete</BaseButton>
     </div>
   </div>

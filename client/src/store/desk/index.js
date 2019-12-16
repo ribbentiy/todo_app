@@ -17,7 +17,7 @@ const desk = {
       state.error = "";
     },
     updateDesk(state, desk) {
-      let list = state.list.filter(el => !(el._id === desk._id));
+      let list = state.list.filter(el => el._id !== desk._id);
       list.push(desk);
       Vue.set(state, "list", list);
       state.error = "";
@@ -38,7 +38,10 @@ const desk = {
     async getList({ commit }) {
       try {
         let res = await axios.get("/api/desks");
+        let tasks = [];
+        res.data.map(el => tasks.push(...el.tasks));
         commit("getDesks", res.data);
+        commit("task/getTasks", tasks, { root: true });
       } catch (err) {
         commit("setError", err);
       }

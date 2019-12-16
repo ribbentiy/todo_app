@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import user from "./user";
 import desk from "./desk";
+import task from "./task";
 import axios from "axios";
 
 Vue.use(Vuex);
@@ -19,6 +20,7 @@ export default new Vuex.Store({
   actions: {},
   modules: {
     user,
-    desk
+    desk,
+    task
   }
 });

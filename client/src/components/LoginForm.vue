@@ -39,7 +39,9 @@
           />
         </div>
       </fieldset>
-      <BaseButton @user-click="validateForm">{{ isSigningIn ? "LogIn" : "SignUp" }}</BaseButton>
+      <BaseButton @user-click="validateForm">{{
+        isSigningIn ? "LogIn" : "SignUp"
+      }}</BaseButton>
     </form>
   </div>
 </template>

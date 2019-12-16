@@ -33,6 +33,6 @@ body {
 .home > .container {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-around;
 }
 </style>
