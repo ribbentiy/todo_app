@@ -47,7 +47,8 @@ const user = {
     }
   },
   getters: {
-    error: state => state.error
+    error: state => state.error,
+    isLoggedIn: state => !!state.token
   }
 };
 

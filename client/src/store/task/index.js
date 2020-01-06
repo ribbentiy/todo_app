@@ -30,6 +30,7 @@ const task = {
         await axios.post("/api/tasks", task);
         //commit('createTask', res.data)
         dispatch("desk/getList", null, { root: true });
+        console.log("success");
       } catch (err) {
         console.error(err);
       }

@@ -5,18 +5,16 @@
       <ul class="tasks-list">
         <li is="Task" v-for="task in desk.tasks" :key="task._id" :task="task"></li>
       </ul>
-      <BaseButton @user-click="delDesk(desk._id)">Delete</BaseButton>
+      <v-btn color="error" @click.stop="delDesk(desk._id)">Delete</v-btn>
     </div>
   </div>
 </template>
 
 <script>
-import BaseButton from "./BaseButton";
 import Task from "./Task";
 
 export default {
   components: {
-    BaseButton,
     Task
   },
   name: "Desk",

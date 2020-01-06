@@ -4,7 +4,7 @@
     <p>{{ message }}</p>
     <input type="checkbox" :id="id" v-model="isDone" disabled />
     <label :for="id">{{ isDone ? "Done" : "Not Done" }}</label>
-    <p>Expiration in: {{ expDate.toDateString() }}</p>
+    <p>Expiration in: {{ expDate }}</p>
   </div>
 </template>
 
@@ -22,7 +22,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this.task);
     this.id = this.task._id;
     this.title = this.task.title;
     this.message = this.task.message;
