@@ -1,11 +1,9 @@
 <template>
   <div class="card">
     <div class="desk">
-      {{ desk.title }}
-      <ul>
-        <li v-for="task in desk.tasks" :key="task._id">
-          {{ `title: ${task.title} -- message: ${task.message}` }}
-        </li>
+      <h2>{{ desk.title }}</h2>
+      <ul class="tasks-list">
+        <li is="Task" v-for="task in desk.tasks" :key="task._id" :task="task"></li>
       </ul>
       <BaseButton @user-click="delDesk(desk._id)">Delete</BaseButton>
     </div>
@@ -14,10 +12,12 @@
 
 <script>
 import BaseButton from "./BaseButton";
+import Task from "./Task";
 
 export default {
   components: {
-    BaseButton
+    BaseButton,
+    Task
   },
   name: "Desk",
   data() {
@@ -34,10 +34,17 @@ export default {
 
 <style scoped>
 .card {
-  width: 200px;
   height: 500px;
   background-color: rgb(204, 204, 204);
   border: 2px solid rgb(104, 104, 104);
   border-radius: 10px;
+}
+
+.desk {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>

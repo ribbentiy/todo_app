@@ -7,11 +7,8 @@ const task = {
     list: []
   },
   mutations: {
-    clearState(state) {
-      Vue.set(state, "list", []);
-    },
     getTasks(state, tasks) {
-      this.clearState(state);
+      Vue.set(state, "list", []);
       state.list.push(...tasks);
     },
     createTask(state, task) {
