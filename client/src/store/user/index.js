@@ -4,13 +4,16 @@ const user = {
   namespaced: true,
   state: {
     token: localStorage.getItem("token") || "",
-    error: ""
+    error: "",
+    user: JSON.parse(localStorage.getItem("user")) || ""
   },
   mutations: {
-    setToken(state, token) {
-      let newToken = "Bearer " + token;
+    authUser(state, responce) {
+      let newToken = "Bearer " + responce.token;
       state.token = newToken;
       localStorage.setItem("token", newToken);
+      let user = JSON.stringify(responce.user);
+      localStorage.setItem("user", user);
     },
 
     setError(state, err) {
@@ -26,7 +29,7 @@ const user = {
           email,
           password
         });
-        commit("setToken", res.data.token);
+        commit("authUser", res.data);
       } catch (err) {
         commit("setError", err);
       }
@@ -40,7 +43,7 @@ const user = {
           email,
           password
         });
-        commit("setToken", res.data.token);
+        commit("authUser", res.data);
       } catch (err) {
         commit("setError", err);
       }

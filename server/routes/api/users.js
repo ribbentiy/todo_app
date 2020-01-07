@@ -26,9 +26,11 @@ router.post("/register", async (req, res) => {
       bcrypt.hash(user.password, salt, async (err, hash) => {
         user.password = hash;
         try {
-          const newUser = await user.save();
+          await user.save();
+          let newUser = User.findOne({ email }).select("-password");
           const token = await giveToken(email, password);
-          res.status(201).send(token);
+          let response = { ...token, user: newUser };
+          res.status(201).send(response);
         } catch (err) {
           console.log(err);
           res.status(500).send();
@@ -46,7 +48,11 @@ router.post("/auth", async (req, res) => {
 
   try {
     const token = await giveToken(email, password);
-    res.send(token);
+    console.log(token);
+    const credentials = await User.findOne({ email }).select("-password");
+    console.log(credentials);
+    const response = { ...token, user: credentials };
+    res.send(response);
   } catch (err) {
     res.status(401).send({ message: err });
   }

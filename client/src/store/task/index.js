@@ -37,7 +37,7 @@ const task = {
     },
     async updateTask({ dispatch }, task) {
       try {
-        await axios.put(`/api/${task._id}`, task);
+        await axios.put(`/api/tasks/${task.id}`, task);
         dispatch("desk/getList", null, { root: true });
       } catch (err) {
         console.error(err);
@@ -45,7 +45,7 @@ const task = {
     },
     async deleteTask({ dispatch }, task_id) {
       try {
-        await axios.delete(`/api/${task_id}`);
+        await axios.delete(`/api/tasks/${task_id}`);
         dispatch("desk/getList", null, { root: true });
       } catch (err) {
         console.error(err);

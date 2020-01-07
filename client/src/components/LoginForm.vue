@@ -39,9 +39,11 @@
           />
         </div>
       </fieldset>
-      <BaseButton @user-click="validateForm">{{
+      <BaseButton @user-click="validateForm">
+        {{
         isSigningIn ? "LogIn" : "SignUp"
-      }}</BaseButton>
+        }}
+      </BaseButton>
     </form>
   </div>
 </template>
@@ -83,11 +85,14 @@ export default {
       if (this.errors.length === 0) {
         const user = { email: this.email, password: this.password };
         if (this.isSigningIn) {
-          this.$store.dispatch("user/authUser", user);
+          this.$store
+            .dispatch("user/authUser", user)
+            .then(() => this.$router.push("/"));
         } else {
-          this.$store.dispatch("user/registerUser", user);
+          this.$store
+            .dispatch("user/registerUser", user)
+            .then(() => this.$router.push("/"));
         }
-        this.$router.push("/");
       }
     }
   }

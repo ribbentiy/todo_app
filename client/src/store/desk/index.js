@@ -9,7 +9,22 @@ const desk = {
   },
   mutations: {
     getDesks(state, desks) {
-      Vue.set(state, "list", desks);
+      let deskArr = desks.map(desk => {
+        if (desk.tasks.length > 1) {
+          desk.task = desk.tasks.sort((a, b) => {
+            if ((a.isDone && b.isDone) || (!a.isDone && !b.isDone)) {
+              let aTime = new Date(a.createdAt).getTime();
+              let bTime = new Date(b.createdAt).getTime();
+
+              return aTime - bTime;
+            } else {
+              return a.isDone - b.isDone;
+            }
+          });
+        }
+        return desk;
+      });
+      Vue.set(state, "list", deskArr);
       state.error = "";
     },
     createDesk(state, desk) {

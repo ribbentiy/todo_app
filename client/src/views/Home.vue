@@ -4,7 +4,14 @@
       <v-app-bar-nav-icon @click.stop="drawer = ! drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>{{this.$route.name}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn color="info" @click.stop="$router.push('/add')">Add Task</v-btn>
+      <v-btn color="info" @click.stop="dialog = true">Add Task</v-btn>
+      <v-dialog v-model="dialog" persistent max-width="500px" transition="dialog-transition">
+        <v-container>
+          <v-row>
+            <AddTask @cancelAdding="dialog = false" />
+          </v-row>
+        </v-container>
+      </v-dialog>
     </v-app-bar>
     <v-navigation-drawer app v-model="drawer" temporary></v-navigation-drawer>
     <v-content>
@@ -21,15 +28,19 @@
 
 <script>
 import Desk from "../components/Desk";
+import AddTask from "../components/AddTask";
+
 export default {
   data() {
     return {
-      drawer: null
+      drawer: null,
+      dialog: false
     };
   },
   name: "home",
   components: {
-    Desk
+    Desk,
+    AddTask
   },
   created() {
     this.$store.dispatch("desk/getList");
