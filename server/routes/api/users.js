@@ -12,7 +12,7 @@ router.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
-    console.log(existingUser);
+    //console.log(existingUser);
     if (!!existingUser._id) {
       throw { message: "User with such credentials are already registered" };
     }
@@ -48,9 +48,7 @@ router.post("/auth", async (req, res) => {
 
   try {
     const token = await giveToken(email, password);
-    console.log(token);
     const credentials = await User.findOne({ email }).select("-password");
-    console.log(credentials);
     const response = { ...token, user: credentials };
     res.send(response);
   } catch (err) {

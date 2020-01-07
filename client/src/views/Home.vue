@@ -45,7 +45,6 @@ export default {
   created() {
     this.$store.dispatch("desk/getList");
   },
-
   computed: {
     deskList() {
       return this.$store.getters["desk/getList"];
@@ -55,8 +54,4 @@ export default {
 </script>
 
 <style>
-body {
-  min-width: 900px;
-  font-family: Arial, Helvetica, sans-serif;
-}
 </style>
