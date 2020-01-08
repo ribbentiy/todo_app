@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title primary-title>Add Task</v-card-title>
+    <v-card-title primary-title>Edit Task</v-card-title>
     <v-card-text>
       <v-container>
         <v-row>
@@ -25,6 +25,9 @@
               lazy-validation
               required
             ></v-textarea>
+          </v-col>
+          <v-col cols="12">
+            <v-checkbox :label="isDone ? 'Done': 'Not done'" v-model="isDone"></v-checkbox>
           </v-col>
           <v-col cols="12" sm="6">
             <v-select
@@ -70,14 +73,16 @@
       </v-container>
     </v-card-text>
     <v-card-actions>
-      <v-btn color="success" @click.prevent="addTask">Submit</v-btn>
-      <v-btn color="warning" @click.prevent="cancelAdding">Cancel</v-btn>
+      <v-btn color="success" @click.prevent="editTask">Submit</v-btn>
+      <v-btn color="warning" @click.prevent="$emit('closeModal')">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
 export default {
+  props: ["task", "desk_id"],
+
   data() {
     return {
       menu: false,
@@ -85,15 +90,20 @@ export default {
       message: "",
       expDate: "",
       desk: "",
+      isDone: false,
       titleRules: [v => !!v || "Title is required"],
       messageRules: [v => !!v || "Message is required"],
-      //TODO: Need to implement Local Desk
       deskRules: [v => !!v || "Desk is required yet"]
     };
   },
 
   mounted() {
-    //this.expDate = new Date(Date.now()).toISOString().substr(0, 10);
+    this.title = this.task.title;
+    this.message = this.task.message;
+    this.expDate = new Date(this.task.expDate).toISOString().substr(0, 10);
+    this.desk = this.desk_id;
+    this.isDone = this.task.isDone;
+
     if (this.$store.getters["user/isLoggedIn"]) {
       console.log("user is logged in");
     } else {
@@ -101,27 +111,19 @@ export default {
     }
   },
   methods: {
-    addTask() {
+    editTask() {
       let task = {
+        _id: this.task._id,
         title: this.title,
         message: this.message,
-        isDone: false,
-        desk: this.desk
+        isDone: this.isDone,
+        desk: this.desk,
+        expDate: this.expDate
       };
 
-      if (this.expDate) {
-        task.expDate = this.expDate;
-      }
-      this.$store
-        .dispatch("task/createTask", task)
-        .then(() => this.cancelAdding());
-    },
-    cancelAdding() {
-      this.title = "";
-      this.message = "";
-      this.expDate = "";
-      this.desk = "";
-      this.$emit("cancelAdding");
+      this.$store.dispatch("task/updateTask", task).then(() => {
+        this.$emit("closeModal");
+      });
     }
   },
   computed: {

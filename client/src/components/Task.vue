@@ -11,9 +11,18 @@
       </p>
     </v-card-text>
     <v-card-actions>
-      <v-btn color="info" fab x-small>
+      <v-btn color="info" fab x-small @click.stop="dialog = true">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
+      <v-dialog
+        v-model="dialog"
+        scrollable
+        persistent
+        max-width="500px"
+        transition="dialog-transition"
+      >
+        <EditTask :task="task" :desk_id="desk_id" @closeModal="dialog = false" />
+      </v-dialog>
       <v-btn color="red" dark fab x-small @click.stop="deleteTask()">
         <v-icon>mdi-trash-can</v-icon>
       </v-btn>
@@ -22,16 +31,21 @@
 </template>
 
 <script>
+import EditTask from "./EditTask";
 export default {
+  components: {
+    EditTask
+  },
   name: "Task",
-  props: ["task"],
+  props: ["task", "desk_id"],
   data() {
     return {
       id: "",
       title: "",
       message: "",
       expDate: "",
-      isDone: false
+      isDone: false,
+      dialog: false
     };
   },
   mounted() {
@@ -44,7 +58,7 @@ export default {
   watch: {
     isDone() {
       this.$store.dispatch("task/updateTask", {
-        id: this.id,
+        _id: this.id,
         isDone: this.isDone
       });
     }
@@ -55,7 +69,7 @@ export default {
     },
     toggleDoneTask() {
       this.$store.dispatch("task/updateTask", {
-        id: this.id,
+        _id: this.id,
         isDone: this.isDone
       });
     }
@@ -63,7 +77,7 @@ export default {
   computed: {
     expireInToString() {
       let expTime = Math.floor(
-        (new Date(Date.now()).getTime() - this.expDate) / 1000
+        (this.expDate - new Date(Date.now()).getTime()) / 1000
       );
       if (expTime < 0) {
         return "Late for: " + Math.floor(-expTime / 86400) + " days";

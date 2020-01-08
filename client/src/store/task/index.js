@@ -37,8 +37,8 @@ const task = {
     },
     async updateTask({ dispatch }, task) {
       try {
-        await axios.put(`/api/tasks/${task.id}`, task);
-        dispatch("desk/getList", null, { root: true });
+        await axios.put(`/api/tasks/${task._id}`, task);
+        await dispatch("desk/getList", null, { root: true });
       } catch (err) {
         console.error(err);
       }

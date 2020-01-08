@@ -5,7 +5,13 @@
       <v-toolbar-title>{{this.$route.name}}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="info" @click.stop="dialog = true">Add Task</v-btn>
-      <v-dialog v-model="dialog" persistent max-width="500px" transition="dialog-transition">
+      <v-dialog
+        v-model="dialog"
+        scrollable
+        persistent
+        max-width="500px"
+        transition="dialog-transition"
+      >
         <v-container>
           <v-row>
             <AddTask @cancelAdding="dialog = false" />
@@ -42,8 +48,8 @@ export default {
     Desk,
     AddTask
   },
-  created() {
-    this.$store.dispatch("desk/getList");
+  async mounted() {
+    await this.$store.dispatch("desk/getList");
   },
   computed: {
     deskList() {

@@ -3,7 +3,7 @@
     <v-card-title primary-title>{{ desk.title }}</v-card-title>
     <v-card-text>
       <ul class="tasks-list">
-        <li is="Task" v-for="task in desk.tasks" :key="task._id" :task="task"></li>
+        <li is="Task" v-for="task in desk.tasks" :key="task._id" :task="task" :desk_id="desk._id"></li>
       </ul>
       <v-btn color="error" @click.stop="delDesk(desk._id)">Delete</v-btn>
     </v-card-text>
