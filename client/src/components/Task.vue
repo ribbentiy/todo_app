@@ -21,7 +21,7 @@
         max-width="500px"
         transition="dialog-transition"
       >
-        <EditTask :task="task" :desk_id="desk_id" @closeModal="dialog = false" />
+        <EditTask :task="task" :desk_id="desk_id" @closeModal="closeModal" />
       </v-dialog>
       <v-btn color="red" dark fab x-small @click.stop="deleteTask()">
         <v-icon>mdi-trash-can</v-icon>
@@ -45,10 +45,13 @@ export default {
       message: "",
       expDate: "",
       isDone: false,
-      dialog: false
+      dialog: false,
+      edited: false
     };
   },
   mounted() {
+    console.log(this.task);
+
     this.id = this.task._id;
     this.title = this.task.title;
     this.message = this.task.message;
@@ -57,10 +60,19 @@ export default {
   },
   watch: {
     isDone() {
-      this.$store.dispatch("task/updateTask", {
-        _id: this.id,
-        isDone: this.isDone
-      });
+      this.toggleDoneTask();
+    },
+    edited() {
+      if (this.edited) {
+        const { title, message, isDone, expDate } = this.$store.getters[
+          "task/getTask"
+        ];
+        this.title = title;
+        this.message = message;
+        this.isDone = isDone;
+        this.expDate = new Date(expDate).getTime();
+        this.edited = false;
+      }
     }
   },
   methods: {
@@ -72,6 +84,11 @@ export default {
         _id: this.id,
         isDone: this.isDone
       });
+      this.edited = true;
+    },
+    closeModal(edited) {
+      this.dialog = false;
+      this.edited = edited;
     }
   },
   computed: {

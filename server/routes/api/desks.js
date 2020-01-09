@@ -9,9 +9,6 @@ router.get("/", async (req, res) => {
   try {
     const desks = await Desk.find({
       user: req.user._id
-    }).populate({
-      path: "tasks",
-      select: "-user -desk"
     });
     res.send(desks);
   } catch (err) {
@@ -26,9 +23,6 @@ router.get("/:id", async (req, res) => {
     const desk = await Desk.findOne({
       user: req.user._id,
       _id: req.params.id
-    }).populate({
-      path: "tasks",
-      select: "-user -desk"
     });
     res.send(desk);
   } catch (err) {
@@ -65,8 +59,7 @@ router.put("/:id", async (req, res) => {
     ).populate({
       path: "tasks",
       select: {
-        user: 0,
-        desk: 0
+        user: 0
       }
     });
 

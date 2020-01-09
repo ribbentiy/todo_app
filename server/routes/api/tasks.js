@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
 
     res.send(tasks);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send("Internal server error");
   }
 });
 
@@ -22,7 +22,10 @@ router.get("/", async (req, res) => {
 //Public
 router.get("/:id", async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findOne({
+      user: req.user._id,
+      _id: req.params.id
+    });
 
     res.send(task);
   } catch (err) {
@@ -34,9 +37,12 @@ router.get("/:id", async (req, res) => {
 //Create a Task
 //Public
 router.post("/", async (req, res) => {
-  const { title, message = "", isDone, expDate, desk } = req.body;
-  const user = req.user._id;
   try {
+    const { title, message, isDone, expDate, desk } = req.body;
+    if (!title) {
+      throw 400;
+    }
+    const user = req.user._id;
     const newTask = new Task({
       title,
       message,
@@ -51,6 +57,9 @@ router.post("/", async (req, res) => {
     findDesk.save();
     res.status(201).send(newTask);
   } catch (err) {
+    if (err === 400) {
+      res.status(400).send("Title and Message are required");
+    }
     console.log(err);
     res.status(500).send();
   }
@@ -64,7 +73,8 @@ router.put("/:id", async (req, res) => {
       user: req.user._id,
       _id: req.params.id
     });
-    if (req.body.desk) {
+
+    if (req.body.desk && req.body.desk != task.desk) {
       const prevDeskId = task.desk;
       const newDeskId = req.body.desk;
       let prevDesk = await Desk.findById(prevDeskId);

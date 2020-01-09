@@ -3,7 +3,13 @@
     <v-card-title primary-title>{{ desk.title }}</v-card-title>
     <v-card-text>
       <ul class="tasks-list">
-        <li is="Task" v-for="task in desk.tasks" :key="task._id" :task="task" :desk_id="desk._id"></li>
+        <li
+          is="Task"
+          v-for="task in taskList(desk._id)"
+          :key="task._id"
+          :task="task"
+          :desk_id="desk._id"
+        ></li>
       </ul>
       <v-btn color="error" @click.stop="delDesk(desk._id)">Delete</v-btn>
     </v-card-text>
@@ -25,7 +31,15 @@ export default {
   methods: {
     delDesk(id) {
       this.$store.dispatch("desk/deleteDesk", id);
+    },
+    taskList(desk_id) {
+      return this.$store.getters["task/getList"](desk_id);
     }
+  },
+  computed: {
+    // taskList(desk_id) {
+    //   return this.$store.getters["task/getList"](desk_id);
+    // }
   }
 };
 </script>

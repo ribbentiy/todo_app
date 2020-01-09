@@ -15,8 +15,24 @@ axios.interceptors.request.use(config => {
 });
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
+  state: {
+    error: "",
+    loading: false
+  },
+  mutations: {
+    setError(state, err) {
+      state.error = err;
+    },
+    clearError(state) {
+      state.error = "";
+    },
+    setLoading(state) {
+      state.loading = true;
+    },
+    clearLoading(state) {
+      state.loading = false;
+    }
+  },
   actions: {},
   modules: {
     user,

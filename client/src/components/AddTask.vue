@@ -15,16 +15,7 @@
             ></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-textarea
-              label="Message"
-              v-model="message"
-              rows="1"
-              auto-grow
-              clearable
-              :rules="messageRules"
-              lazy-validation
-              required
-            ></v-textarea>
+            <v-textarea label="Message" v-model="message" rows="1" auto-grow clearable></v-textarea>
           </v-col>
           <v-col cols="12" sm="6">
             <v-select
@@ -86,7 +77,7 @@ export default {
       expDate: "",
       desk: "",
       titleRules: [v => !!v || "Title is required"],
-      messageRules: [v => !!v || "Message is required"],
+
       //TODO: Need to implement Local Desk
       deskRules: [v => !!v || "Desk is required yet"]
     };

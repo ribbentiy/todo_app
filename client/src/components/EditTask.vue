@@ -15,16 +15,7 @@
             ></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-textarea
-              label="Message"
-              v-model="message"
-              rows="1"
-              auto-grow
-              clearable
-              :rules="messageRules"
-              lazy-validation
-              required
-            ></v-textarea>
+            <v-textarea label="Message" v-model="message" rows="1" auto-grow clearable></v-textarea>
           </v-col>
           <v-col cols="12">
             <v-checkbox :label="isDone ? 'Done': 'Not done'" v-model="isDone"></v-checkbox>
@@ -73,8 +64,8 @@
       </v-container>
     </v-card-text>
     <v-card-actions>
-      <v-btn color="success" @click.prevent="editTask">Submit</v-btn>
-      <v-btn color="warning" @click.prevent="$emit('closeModal')">Cancel</v-btn>
+      <v-btn color="primary" @click.prevent="editTask">Submit</v-btn>
+      <v-btn color="secondary" @click.prevent="$emit('closeModal', false)">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -92,7 +83,6 @@ export default {
       desk: "",
       isDone: false,
       titleRules: [v => !!v || "Title is required"],
-      messageRules: [v => !!v || "Message is required"],
       deskRules: [v => !!v || "Desk is required yet"]
     };
   },
@@ -111,7 +101,7 @@ export default {
     }
   },
   methods: {
-    editTask() {
+    async editTask() {
       let task = {
         _id: this.task._id,
         title: this.title,
@@ -121,9 +111,8 @@ export default {
         expDate: this.expDate
       };
 
-      this.$store.dispatch("task/updateTask", task).then(() => {
-        this.$emit("closeModal");
-      });
+      await this.$store.dispatch("task/updateTask", task);
+      this.$emit("closeModal", true);
     }
   },
   computed: {

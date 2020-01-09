@@ -4,91 +4,79 @@ import Vue from "vue";
 const desk = {
   namespaced: true,
   state: {
-    list: [],
-    error: ""
+    list: []
   },
   mutations: {
     getDesks(state, desks) {
-      let deskArr = desks.map(desk => {
-        if (desk.tasks.length > 1) {
-          desk.task = desk.tasks.sort((a, b) => {
-            if ((a.isDone && b.isDone) || (!a.isDone && !b.isDone)) {
-              let aTime = new Date(a.createdAt).getTime();
-              let bTime = new Date(b.createdAt).getTime();
-
-              return aTime - bTime;
-            } else {
-              return a.isDone - b.isDone;
-            }
-          });
-        }
-        return desk;
-      });
-      Vue.set(state, "list", deskArr);
+      Vue.set(state, "list", desks);
       state.error = "";
     },
     createDesk(state, desk) {
       state.list.push(desk);
-      state.error = "";
     },
     updateDesk(state, desk) {
       let list = state.list.filter(el => el._id !== desk._id);
       list.push(desk);
       Vue.set(state, "list", list);
-      state.error = "";
     },
     deleteDesk(state, id) {
       let list = state.list.filter(el => !(el._id === id));
       Vue.set(state, "list", list);
-      state.error = "";
-    },
-    setError(state, err) {
-      console.error(err);
-      state.error = err.message;
     }
   },
   actions: {
     //Get Desk List
     //Get /api/desks/
     async getList({ commit }) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
         let res = await axios.get("/api/desks");
+        commit("clearLoading", null, { root: true });
         let tasks = [];
         res.data.map(el => tasks.push(...el.tasks));
         commit("getDesks", res.data);
-        commit("task/getTasks", tasks, { root: true });
       } catch (err) {
-        commit("setError", err);
+        commit("setError", err, { root: true });
       }
     },
     //Create Desk
     //Post /api/desks/
     async createDesk({ commit }, title) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
         let res = await axios.post("/api/desks", { title });
+        commit("clearLoading", null, { root: true });
         commit("createDesk", res.data);
       } catch (err) {
-        commit("setError", err);
+        commit("setError", err, { root: true });
       }
     },
     //Update desk
     //Put /api/desks/:id
     async updateDesk({ commit }, { id, payload }) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
-        let res = axios.put(`/api/desks/${id}`, payload);
+        let res = await axios.put(`/api/desks/${id}`, payload);
+        commit("clearLoading", null, { root: true });
         commit("updateDesk", res.data);
       } catch (err) {
-        commit("setError", err);
+        commit("setError", err, { root: true });
       }
     },
     //Delete desk
     //Delete /api/desks/:id
     async deleteDesk({ commit }, id) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
         await axios.delete(`/api/desks/${id}`);
+        commit("clearLoading", null, { root: true });
         commit("deleteDesk", id);
       } catch (err) {
-        commit("setError", err);
+        commit("setError", err, { root: true });
       }
     }
   },

@@ -23,7 +23,15 @@
     <v-content>
       <v-container fluid>
         <v-row>
-          <v-col v-for="(item, index) in deskList" :key="index" cols="12" xl="4" md="6" sm="12">
+          <v-col
+            v-for="(item, index) in deskList"
+            :key="index"
+            cols="12"
+            xl="4"
+            md="6"
+            sm="6"
+            class="board"
+          >
             <Desk :desk="item" />
           </v-col>
         </v-row>
@@ -48,8 +56,10 @@ export default {
     Desk,
     AddTask
   },
-  async mounted() {
-    await this.$store.dispatch("desk/getList");
+  mounted() {
+    this.$store
+      .dispatch("desk/getList")
+      .then(() => this.$store.dispatch("task/getList"));
   },
   computed: {
     deskList() {
@@ -60,4 +70,8 @@ export default {
 </script>
 
 <style>
+.board {
+  height: 100vh;
+  overflow: auto;
+}
 </style>
