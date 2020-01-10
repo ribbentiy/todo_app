@@ -5,9 +5,9 @@
       <ul class="tasks-list">
         <li
           is="Task"
-          v-for="task in taskList(desk._id)"
+          v-for="task in taskList"
           :key="task._id"
-          :task="task"
+          :task_id="task._id"
           :desk_id="desk._id"
         ></li>
       </ul>
@@ -31,15 +31,12 @@ export default {
   methods: {
     delDesk(id) {
       this.$store.dispatch("desk/deleteDesk", id);
-    },
-    taskList(desk_id) {
-      return this.$store.getters["task/getList"](desk_id);
     }
   },
   computed: {
-    // taskList(desk_id) {
-    //   return this.$store.getters["task/getList"](desk_id);
-    // }
+    taskList() {
+      return this.$store.getters["task/getList"](this.desk._id);
+    }
   }
 };
 </script>

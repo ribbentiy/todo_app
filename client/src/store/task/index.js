@@ -4,17 +4,12 @@ import Vue from "vue";
 const task = {
   namespaced: true,
   state: {
-    list: [],
-    task: {}
+    list: []
   },
   mutations: {
     getTasks(state, tasks) {
       let list = sortTasks(tasks);
       Vue.set(state, "list", list);
-      console.log(state.list);
-    },
-    getTask(state, task) {
-      Vue.set(state, "task", task);
     },
     createTask(state, task) {
       state.list.unshift(task);
@@ -28,9 +23,6 @@ const task = {
     deleteTask(state, task_id) {
       let list = state.list.filter(el => el._id !== task_id);
       Vue.set(state, "list", list);
-    },
-    selectTask(state, task) {
-      Vue.set(state, "task", task);
     }
   },
   actions: {
@@ -42,20 +34,15 @@ const task = {
         console.error(error);
       }
     },
-    async getTask({ commit }, id) {
-      try {
-        const res = await axios.get(`/api/tasks/${id}`);
-        commit("getTask", res.data);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
-    async createTask({ commit, dispatch }, task) {
+    async createTask({ commit }, task) {
       try {
         let res = await axios.post("/api/tasks", task);
         commit("createTask", res.data);
-        dispatch("desk/createTaskLocal", res.data, { root: true });
+        commit(
+          "desk/updateDeskLocal",
+          { methode: "create", task: res.data },
+          { root: true }
+        );
       } catch (err) {
         console.error(err);
       }
@@ -63,16 +50,25 @@ const task = {
     async updateTask({ commit }, task) {
       try {
         let res = await axios.put(`/api/tasks/${task._id}`, task);
-        commit("selectTask", res.data);
         commit("updateTask", res.data);
+        commit(
+          "desk/updateDeskLocal",
+          { methode: "update", task: res.data },
+          { root: true }
+        );
       } catch (err) {
         console.error(err);
       }
     },
-    async deleteTask({ dispatch }, task_id) {
+    async deleteTask({ commit }, task) {
       try {
-        await axios.delete(`/api/tasks/${task_id}`);
-        dispatch("desk/getList", null, { root: true });
+        await axios.delete(`/api/tasks/${task._id}`);
+        commit("deleteTask", task._id);
+        commit(
+          "desk/updateDeskLocal",
+          { methode: "delete", task },
+          { root: true }
+        );
       } catch (err) {
         console.error(err);
       }
@@ -80,7 +76,7 @@ const task = {
   },
   getters: {
     getList: state => desk_id => state.list.filter(el => el.desk === desk_id),
-    getTask: state => state.task
+    getTask: state => id => state.list.find(el => el._id === id)
   }
 };
 

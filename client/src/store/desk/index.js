@@ -9,7 +9,6 @@ const desk = {
   mutations: {
     getDesks(state, desks) {
       Vue.set(state, "list", desks);
-      state.error = "";
     },
     createDesk(state, desk) {
       state.list.push(desk);
@@ -22,6 +21,34 @@ const desk = {
     deleteDesk(state, id) {
       let list = state.list.filter(el => !(el._id === id));
       Vue.set(state, "list", list);
+    },
+    updateDeskLocal(state, options) {
+      let { methode, task } = options;
+
+      if (methode == "create") {
+        state.list.find(el => el._id == task.desk).tasks.push(task._id);
+      }
+      if (methode == "delete") {
+        let deskIndex = state.list.findIndex(el => el._id == task.desk);
+        let taskIndex = state.list[deskIndex].tasks.findIndex(
+          el => el._id == task._id
+        );
+        state.list[deskIndex].tasks.splice(taskIndex, 1);
+      }
+      if (methode == "update") {
+        let newDeskIndex = state.list.findIndex(el => el._id == task.desk);
+
+        if (!state.list[newDeskIndex].tasks.includes(task._id)) {
+          let oldDeskIndex = state.list.findIndex(el =>
+            el.tasks.some(el => el == task._id)
+          );
+          let oldTaskIndex = state.list[oldDeskIndex].tasks.findIndex(
+            el => el == task._id
+          );
+          state.list[oldDeskIndex].tasks.splice(oldTaskIndex, 1);
+          state.list[newDeskIndex].tasks.push(task._id);
+        }
+      }
     }
   },
   actions: {
@@ -33,8 +60,6 @@ const desk = {
       try {
         let res = await axios.get("/api/desks");
         commit("clearLoading", null, { root: true });
-        let tasks = [];
-        res.data.map(el => tasks.push(...el.tasks));
         commit("getDesks", res.data);
       } catch (err) {
         commit("setError", err, { root: true });

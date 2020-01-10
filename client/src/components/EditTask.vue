@@ -65,14 +65,14 @@
     </v-card-text>
     <v-card-actions>
       <v-btn color="primary" @click.prevent="editTask">Submit</v-btn>
-      <v-btn color="secondary" @click.prevent="$emit('closeModal', false)">Cancel</v-btn>
+      <v-btn color="secondary" @click.prevent="$emit('closeModal')">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
 export default {
-  props: ["task", "desk_id"],
+  props: ["task_id", "desk_id", "open"],
 
   data() {
     return {
@@ -88,22 +88,35 @@ export default {
   },
 
   mounted() {
-    this.title = this.task.title;
-    this.message = this.task.message;
-    this.expDate = new Date(this.task.expDate).toISOString().substr(0, 10);
-    this.desk = this.desk_id;
-    this.isDone = this.task.isDone;
+    const { title, message, isDone, expDate } = this.$store.getters[
+      "task/getTask"
+    ](this.task_id);
 
-    if (this.$store.getters["user/isLoggedIn"]) {
-      console.log("user is logged in");
-    } else {
-      console.log("user is not logged in");
+    this.title = title;
+    this.message = message;
+    this.expDate = new Date(expDate).toISOString().substr(0, 10);
+    this.desk = this.desk_id;
+    this.isDone = isDone;
+  },
+  watch: {
+    open() {
+      if (this.open) {
+        const { title, message, isDone, expDate } = this.$store.getters[
+          "task/getTask"
+        ](this.task_id);
+
+        this.title = title;
+        this.message = message;
+        this.expDate = new Date(expDate).toISOString().substr(0, 10);
+        this.desk = this.desk_id;
+        this.isDone = isDone;
+      }
     }
   },
   methods: {
     async editTask() {
       let task = {
-        _id: this.task._id,
+        _id: this.task_id,
         title: this.title,
         message: this.message,
         isDone: this.isDone,
@@ -112,7 +125,8 @@ export default {
       };
 
       await this.$store.dispatch("task/updateTask", task);
-      this.$emit("closeModal", true);
+
+      this.$emit("closeModal");
     }
   },
   computed: {

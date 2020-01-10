@@ -1,8 +1,8 @@
 <template>
   <v-card class="card" :class="isDone ? 'is-done': ''">
-    <v-card-title>{{ title }}</v-card-title>
+    <v-card-title>{{ task.title }}</v-card-title>
     <v-card-text>
-      <p>{{ message }}</p>
+      <p>{{ task.message }}</p>
       <v-checkbox :label="isDone ? 'Done': 'Not done'" v-model="isDone"></v-checkbox>
 
       <p>
@@ -21,7 +21,7 @@
         max-width="500px"
         transition="dialog-transition"
       >
-        <EditTask :task="task" :desk_id="desk_id" @closeModal="closeModal" />
+        <EditTask :task_id="task_id" :open="dialog" :desk_id="desk_id" @closeModal="closeModal" />
       </v-dialog>
       <v-btn color="red" dark fab x-small @click.stop="deleteTask()">
         <v-icon>mdi-trash-can</v-icon>
@@ -37,64 +37,30 @@ export default {
     EditTask
   },
   name: "Task",
-  props: ["task", "desk_id"],
+  props: ["task_id", "desk_id"],
   data() {
     return {
-      id: "",
-      title: "",
-      message: "",
-      expDate: "",
-      isDone: false,
-      dialog: false,
-      edited: false
+      dialog: false
     };
   },
-  mounted() {
-    console.log(this.task);
 
-    this.id = this.task._id;
-    this.title = this.task.title;
-    this.message = this.task.message;
-    this.expDate = new Date(this.task.expDate).getTime();
-    this.isDone = this.task.isDone;
-  },
-  watch: {
-    isDone() {
-      this.toggleDoneTask();
-    },
-    edited() {
-      if (this.edited) {
-        const { title, message, isDone, expDate } = this.$store.getters[
-          "task/getTask"
-        ];
-        this.title = title;
-        this.message = message;
-        this.isDone = isDone;
-        this.expDate = new Date(expDate).getTime();
-        this.edited = false;
-      }
-    }
-  },
   methods: {
     deleteTask() {
-      this.$store.dispatch("task/deleteTask", this.id);
-    },
-    toggleDoneTask() {
-      this.$store.dispatch("task/updateTask", {
-        _id: this.id,
-        isDone: this.isDone
+      this.$store.dispatch("task/deleteTask", {
+        _id: this.task_id,
+        desk: this.desk_id
       });
-      this.edited = true;
     },
-    closeModal(edited) {
+    closeModal() {
       this.dialog = false;
-      this.edited = edited;
     }
   },
   computed: {
     expireInToString() {
       let expTime = Math.floor(
-        (this.expDate - new Date(Date.now()).getTime()) / 1000
+        (new Date(this.task.expDate).getTime() -
+          new Date(Date.now()).getTime()) /
+          1000
       );
       if (expTime < 0) {
         return "Late for: " + Math.floor(-expTime / 86400) + " days";
@@ -104,6 +70,20 @@ export default {
         return "Days left: " + days;
       } else {
         return "Less than one day left";
+      }
+    },
+    task() {
+      return this.$store.getters["task/getTask"](this.task_id);
+    },
+    isDone: {
+      get() {
+        return this.task.isDone;
+      },
+      set(e) {
+        this.$store.dispatch("task/updateTask", {
+          _id: this.task_id,
+          isDone: e
+        });
       }
     }
   }
