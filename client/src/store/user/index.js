@@ -5,7 +5,7 @@ const user = {
   state: {
     token: localStorage.getItem("token") || "",
     error: "",
-    user: JSON.parse(localStorage.getItem("user")) || ""
+    user: JSON.parse(localStorage.getItem("user")) || {}
   },
   mutations: {
     authUser(state, responce) {
@@ -51,7 +51,11 @@ const user = {
   },
   getters: {
     error: state => state.error,
-    isLoggedIn: state => !!state.token
+    isLoggedIn: state => !!state.token,
+    getUser: state => {
+      let user = { firstName: "John", lastName: "Dow", email: "anonymus" };
+      return { ...user, ...state.user };
+    }
   }
 };
 

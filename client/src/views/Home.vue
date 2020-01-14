@@ -1,6 +1,9 @@
 <template>
   <div>
-    <v-app-bar app>
+    <v-navigation-drawer app v-model="drawer" clipped>
+      <Drawer />
+    </v-navigation-drawer>
+    <v-app-bar app clipped-left>
       <v-app-bar-nav-icon @click.stop="drawer = ! drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>{{this.$route.name}}</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -19,7 +22,7 @@
         </v-container>
       </v-dialog>
     </v-app-bar>
-    <v-navigation-drawer app v-model="drawer" temporary></v-navigation-drawer>
+
     <v-content>
       <v-container fluid>
         <v-row>
@@ -43,6 +46,7 @@
 <script>
 import Desk from "../components/Desk";
 import AddTask from "../components/AddTask";
+import Drawer from "../components/Drawer";
 
 export default {
   data() {
@@ -54,7 +58,8 @@ export default {
   name: "home",
   components: {
     Desk,
-    AddTask
+    AddTask,
+    Drawer
   },
   mounted() {
     this.$store
