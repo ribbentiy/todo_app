@@ -1,5 +1,5 @@
 <template>
-  <v-card class="card" :class="isDone ? 'is-done': ''">
+  <v-card class="card" :class="isDone ? 'is-done': ''" :color="late ? 'red lighten-3' : ''">
     <v-card-title>{{ task.title }}</v-card-title>
     <v-card-text>
       <p>{{ task.message }}</p>
@@ -76,6 +76,15 @@ export default {
       } else {
         return "Less than one day left";
       }
+    },
+    late() {
+      return (
+        Math.floor(
+          (new Date(this.task.expDate).getTime() -
+            new Date(Date.now()).getTime()) /
+            1000
+        ) < 0
+      );
     },
     task() {
       return this.$store.getters["task/getTask"](this.task_id);
