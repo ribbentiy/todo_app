@@ -21,7 +21,12 @@
         max-width="500px"
         transition="dialog-transition"
       >
-        <EditTask :task_id="task_id" :open="dialog" :desk_id="desk_id" @closeModal="closeModal" />
+        <EditTask
+          :task_id="task_id"
+          :open="dialog"
+          :desk_id="desk_id"
+          @closeModal="dialog = false"
+        />
       </v-dialog>
       <v-btn color="red" dark fab x-small @click.stop="deleteTask()">
         <v-icon>mdi-trash-can</v-icon>

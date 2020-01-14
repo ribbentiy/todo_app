@@ -1,4 +1,5 @@
 import axios from "axios";
+import Vue from "vue";
 
 const user = {
   namespaced: true,
@@ -12,12 +13,22 @@ const user = {
       let newToken = "Bearer " + responce.token;
       state.token = newToken;
       localStorage.setItem("token", newToken);
-      let user = JSON.stringify(responce.user);
-      localStorage.setItem("user", user);
+      let user = {
+        ...responce.user
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      Vue.set(state, "user", user);
     },
 
     setError(state, err) {
       state.error = err.message;
+    },
+    logOut(state) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      state.token = "";
+      let user = { firstName: "John", lastName: "Dow", email: "anonymous" };
+      Vue.set(state, "user", user);
     }
   },
   actions: {
@@ -47,15 +58,23 @@ const user = {
       } catch (err) {
         commit("setError", err);
       }
+    },
+    async updateUser({ commit }, user) {
+      try {
+        const res = await axios.put(`/api/user/${user._id}`, user);
+        commit("authUser", res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    logOut({ commit }) {
+      commit("logOut");
     }
   },
   getters: {
     error: state => state.error,
     isLoggedIn: state => !!state.token,
-    getUser: state => {
-      let user = { firstName: "John", lastName: "Dow", email: "anonymus" };
-      return { ...user, ...state.user };
-    }
+    getUser: state => state.user
   }
 };
 

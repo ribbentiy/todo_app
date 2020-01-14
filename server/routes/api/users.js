@@ -56,6 +56,34 @@ router.post("/auth", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    if (req.body.password) {
+      throw "501";
+    }
+    if (req.user._id !== req.params.id) {
+      throw "503";
+    }
+    const user = await User.findByIdAndUpdate(req.user._id, req.body, {
+      new: true
+    }).select("-password");
+    const token = jwt.sign(user.toJSON(), config.JWT_SECRET, {
+      expiresIn: "365d"
+    });
+
+    const { iat, exp } = jwt.decode(token);
+    res.status(200).send({ iat, exp, token, user });
+  } catch (e) {
+    if (e == "501") {
+      return res.status(501).send({ message: "Not implemented yet" });
+    }
+    if (e == "503") {
+      return res.status(503).send({ message: "Forbidden" });
+    }
+    res.send(e);
+  }
+});
+
 const giveToken = async (email, password) => {
   //Authenticate user
   const user = await auth.autheticate(email, password);
