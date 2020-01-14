@@ -11,7 +11,7 @@
           :desk_id="desk._id"
         ></li>
       </ul>
-      <v-btn color="error" @click.stop="delDesk(desk._id)">Delete</v-btn>
+      <!-- <v-btn color="error" @click.stop="delDesk(desk._id)">Delete</v-btn> -->
     </v-card-text>
   </v-card>
 </template>

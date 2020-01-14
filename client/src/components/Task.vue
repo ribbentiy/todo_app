@@ -1,7 +1,8 @@
 <template>
-  <v-card class="card" :class="isDone ? 'is-done': ''" :color="late ? 'red lighten-3' : ''">
-    <v-card-title>{{ task.title }}</v-card-title>
-    <v-card-text>
+  <v-card class="card" :color="isDone ? 'green lighten-4' : late ? 'red lighten-4' : ''">
+    <v-card-title @click="expanded = !expanded">{{ task.title }}</v-card-title>
+
+    <v-card-text v-show="expanded">
       <p>{{ task.message }}</p>
       <v-checkbox :label="isDone ? 'Done': 'Not done'" v-model="isDone"></v-checkbox>
 
@@ -10,7 +11,7 @@
         <em>{{ expireInToString }}</em>
       </p>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions v-show="expanded">
       <v-btn color="info" fab x-small @click.stop="dialog = true">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
@@ -45,7 +46,8 @@ export default {
   props: ["task_id", "desk_id"],
   data() {
     return {
-      dialog: false
+      dialog: false,
+      expanded: false
     };
   },
 
@@ -79,6 +81,7 @@ export default {
     },
     late() {
       return (
+        !this.isDone &&
         Math.floor(
           (new Date(this.task.expDate).getTime() -
             new Date(Date.now()).getTime()) /
