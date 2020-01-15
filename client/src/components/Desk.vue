@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :color="desk.local ? 'grey lighten-2' : ''">
     <v-card-title primary-title>{{ desk.title }}</v-card-title>
     <v-card-text>
       <ul class="tasks-list">
@@ -35,11 +35,13 @@ export default {
   },
   computed: {
     taskList() {
-      return this.$store.getters["task/getList"](this.desk._id);
+      if (!this.desk.local) {
+        return this.$store.getters["task/getList"](this.desk._id);
+      }
+      return this.$store.getters["task/getLocalList"];
     }
   }
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

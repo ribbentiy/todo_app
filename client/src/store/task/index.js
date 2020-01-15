@@ -1,10 +1,16 @@
 import axios from "axios";
 import Vue from "vue";
+import Dexie from "dexie";
+const db = new Dexie("LocalDesk");
+db.version(1).stores({
+  tasks: "++_id, title, message, expDate, createdAt, isDone, desk"
+});
 
 const task = {
   namespaced: true,
   state: {
-    list: []
+    list: [],
+    localList: []
   },
   mutations: {
     getTasks(state, tasks) {
@@ -23,6 +29,23 @@ const task = {
     deleteTask(state, task_id) {
       let list = state.list.filter(el => el._id !== task_id);
       Vue.set(state, "list", list);
+    },
+    getLocalTasks(state, tasks) {
+      let list = sortTasks(tasks);
+      Vue.set(state, "localList", list);
+    },
+    addLocalTask(state, task) {
+      state.localList.unshift(task);
+    },
+    updateLocalTask(state, task) {
+      let list = state.localList.filter(el => el._id !== task.id);
+      list.push(task);
+      list = sortTasks(list);
+      Vue.set(state, "localList", list);
+    },
+    deleteLocalTask(state, task_id) {
+      let list = state.localList.filter(el => el._id !== task_id);
+      Vue.set(state, "localList", list);
     }
   },
   actions: {
@@ -72,11 +95,47 @@ const task = {
       } catch (err) {
         console.error(err);
       }
+    },
+    async getLocalTasks({ commit }) {
+      try {
+        let res = await db.tasks.get();
+        console.log(res);
+        commit("getLocalTasks", res);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async addLocalTask({ commit }, task) {
+      try {
+        let res = await db.tasks.add({ task });
+        console.log(res);
+        commit("addLocalTask", res);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async updateLocalTask({ commit }, { id, ...payload }) {
+      try {
+        let res = await db.tasks.update(id, payload);
+        console.log(res);
+        commit("updateLocalTask", res);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async deleteLocalTask({ commit }, id) {
+      try {
+        await db.tasks.delete(id);
+        commit("deleteLocalTask", id);
+      } catch (error) {
+        console.error(error);
+      }
     }
   },
   getters: {
     getList: state => desk_id => state.list.filter(el => el.desk === desk_id),
-    getTask: state => id => state.list.find(el => el._id === id)
+    getTask: state => id => state.list.find(el => el._id === id),
+    getLocalList: state => state.localList
   }
 };
 
