@@ -65,9 +65,11 @@ export default {
     Drawer
   },
   mounted() {
-    this.$store
-      .dispatch("desk/getList")
-      .then(() => this.$store.dispatch("task/getList"));
+    if (this.$store.getters["user/isLoggedIn"]) {
+      this.$store
+        .dispatch("desk/getList")
+        .then(this.$store.dispatch("task/getList"));
+    }
   },
   computed: {
     deskList() {

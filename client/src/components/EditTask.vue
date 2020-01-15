@@ -15,10 +15,19 @@
             ></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-textarea label="Message" v-model="message" rows="1" auto-grow clearable></v-textarea>
+            <v-textarea
+              label="Message"
+              v-model="message"
+              rows="1"
+              auto-grow
+              clearable
+            ></v-textarea>
           </v-col>
           <v-col cols="12">
-            <v-checkbox :label="isDone ? 'Done': 'Not done'" v-model="isDone"></v-checkbox>
+            <v-checkbox
+              :label="isDone ? 'Done' : 'Not done'"
+              v-model="isDone"
+            ></v-checkbox>
           </v-col>
           <v-col cols="12" sm="6">
             <v-select
@@ -30,7 +39,8 @@
               clearable
               :rules="deskRules"
               required
-            ></v-select>
+            >
+            </v-select>
           </v-col>
           <v-col cols="12" sm="6">
             <v-menu
@@ -56,7 +66,9 @@
               <v-date-picker v-model="expDate" no-title scrollable>
                 <v-spacer></v-spacer>
                 <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-                <v-btn text color="primary" @click="$refs.menu.save(expDate)">OK</v-btn>
+                <v-btn text color="primary" @click="$refs.menu.save(expDate)"
+                  >OK</v-btn
+                >
               </v-date-picker>
             </v-menu>
           </v-col>
@@ -65,7 +77,9 @@
     </v-card-text>
     <v-card-actions>
       <v-btn color="primary" @click.prevent="editTask">Submit</v-btn>
-      <v-btn color="secondary" @click.prevent="$emit('closeModal')">Cancel</v-btn>
+      <v-btn color="secondary" @click.prevent="$emit('closeModal')"
+        >Cancel</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
@@ -137,5 +151,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
