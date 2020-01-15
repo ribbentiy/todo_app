@@ -1,118 +1,90 @@
 <template>
-  <div class="login-form">
-    <form novalidate>
-      <div class="errors" v-if="!(errors.length === 0)">
-        <b>Following errors have been occured:</b>
-        <ul>
-          <li v-for="(err, index) in errors" :key="index">{{ err }}</li>
-        </ul>
-      </div>
-      <fieldset>
-        <label for="login-email">Email:</label>
-        <br />
-        <input
-          type="email"
-          id="login-email"
+  <v-card>
+    <v-card-title>Login/Signin Form</v-card-title>
+    <v-card-text>
+      <v-form ref="form" v-model="form">
+        <v-text-field
+          label="Email address"
           v-model="email"
-          placeholder="JonDow@example.com"
-          title="Please fill the email field"
-        />
-      </fieldset>
-      <fieldset>
-        <label for="login-password">Password:</label>
-        <br />
-        <input
-          type="password"
-          id="login-password"
+          :rules="[rules.email, rules.required]"
+          type="email"
+        ></v-text-field>
+        <v-text-field
+          label="Password"
           v-model="password"
-          placeholder="*****"
-          title="Please fill the password field"
-        />
-        <div v-if="!isSigningIn">
-          <label for="login-confirm">Confirm password:</label>
-          <br />
-          <input
-            type="password"
-            v-model="confirmPassword"
-            id="login-confirm"
-            title="Please confirm password"
-          />
-        </div>
-      </fieldset>
-      <BaseButton @user-click="validateForm">
-        {{
-        isSigningIn ? "LogIn" : "SignUp"
-        }}
-      </BaseButton>
-    </form>
-  </div>
+          counter="6"
+          :rules="[rules.required, rules.length(4)]"
+          type="password"
+        ></v-text-field>
+        <v-text-field
+          v-if="signIn"
+          label="Confirm Password"
+          type="password"
+          :rules="[rules.required, rules.isEqual(password)]"
+        ></v-text-field>
+        <v-switch v-model="signIn" inset label="SignIn?"></v-switch>
+      </v-form>
+    </v-card-text>
+    <v-divider></v-divider>
+    <v-card-actions>
+      <v-btn color="secondary" @click="$refs.form.reset()">Clear</v-btn>
+      <v-btn color="secondary" @click="closeModal">Cancel</v-btn>
+      <v-spacer></v-spacer>
+      <v-btn color="success" :disabled="!form" @click="submitForm"
+        >Submit</v-btn
+      >
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
 import isEmail from "validator/es/lib/isEmail";
 import equals from "validator/es/lib/equals";
-import BaseButton from "../components/BaseButton";
 
 export default {
   name: "LoginForm",
-  components: {
-    BaseButton
-  },
-  props: {
-    isSigningIn: Boolean
-  },
+
   data: () => ({
-    errors: [],
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    form: false,
+    signIn: false,
+    rules: {
+      email: v => isEmail(v || "") || "Please enter a valid email",
+      required: v => !!v || "This field is required",
+      length: len => v =>
+        (v || "").length >= len || `Invalid character length, required ${len}`,
+      isEqual: str => v =>
+        equals(v || "", str) || "Password and confirmation should be the same"
+    }
   }),
   methods: {
-    validateForm() {
-      this.errors = [];
-      if (!this.email) {
-        this.errors.push("No email provided");
-      }
-      if (!isEmail(this.email)) {
-        this.errors.push("Email should be valid email adress");
-      }
-      if (!this.password) {
-        this.errors.push("No password provided");
-      }
-      if (!this.isSigningIn && !equals(this.password, this.confirmPassword)) {
-        this.errors.push("Password and confirmation must be the same");
-      }
-      if (this.errors.length === 0) {
-        const user = { email: this.email, password: this.password };
-        if (this.isSigningIn) {
-          this.$store
-            .dispatch("user/authUser", user)
-            .then(() => this.$router.push("/"));
+    closeModal() {
+      this.$refs.form.reset();
+      this.$emit("closeModal");
+    },
+    submitForm() {
+      try {
+        if (this.signIn) {
+          this.$store.dispatch("user/registerUser", {
+            email: this.email,
+            password: this.password
+          });
         } else {
-          this.$store
-            .dispatch("user/registerUser", user)
-            .then(() => this.$router.push("/"));
+          this.$store.dispatch("user/authUser", {
+            email: this.email,
+            password: this.password
+          });
         }
+        this.$refs.form.reset();
+        this.$emit("closeModal");
+      } catch (error) {
+        console.error(error);
       }
     }
   }
 };
 </script>
 
-<style scoped>
-.login-form input {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.errors {
-  background-color: rgb(255, 164, 164);
-  border: 3px solid rgb(255, 120, 120);
-}
-
-fieldset {
-  width: 300px;
-  border: none;
-  padding: 0;
-}
-</style>
+<style scoped></style>

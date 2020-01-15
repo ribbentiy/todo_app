@@ -7,6 +7,9 @@ const desk = {
     list: []
   },
   mutations: {
+    clearList(state) {
+      Vue.set(state, "list", []);
+    },
     getDesks(state, desks) {
       Vue.set(state, "list", desks);
     },

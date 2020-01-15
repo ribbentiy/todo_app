@@ -46,6 +46,9 @@ const task = {
     deleteLocalTask(state, task_id) {
       let list = state.localList.filter(el => el._id !== task_id);
       Vue.set(state, "localList", list);
+    },
+    clearList(state) {
+      Vue.set(state, "list", []);
     }
   },
   actions: {

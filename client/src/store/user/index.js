@@ -48,13 +48,15 @@ const user = {
 
     // Auth user
     // Post /auth
-    async authUser({ commit }, { email, password }) {
+    async authUser({ commit, dispatch }, { email, password }) {
       try {
         const res = await axios.post("/api/user/auth", {
           email,
           password
         });
         commit("authUser", res.data);
+        await dispatch("desk/getList", null, { root: true });
+        await dispatch("task/getList", null, { root: true });
       } catch (err) {
         commit("setError", err);
       }
@@ -69,6 +71,8 @@ const user = {
     },
     logOut({ commit }) {
       commit("logOut");
+      commit("desk/clearList", null, { root: true });
+      commit("task/clearList", null, { root: true });
     }
   },
   getters: {
