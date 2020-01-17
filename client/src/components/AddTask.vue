@@ -13,10 +13,16 @@
                 :rules="titleRules"
                 required
                 lazy-validation
-              ></v-text-field>
+              />
             </v-col>
             <v-col cols="12">
-              <v-textarea label="Message" v-model="message" rows="1" auto-grow clearable></v-textarea>
+              <v-textarea
+                label="Message"
+                v-model="message"
+                rows="1"
+                auto-grow
+                clearable
+              />
             </v-col>
             <v-col cols="12" sm="6">
               <v-select
@@ -29,9 +35,7 @@
                 clearable
                 :rules="deskRules"
                 required
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="6">
+              />
               <v-menu
                 ref="menu"
                 v-model="menu"
@@ -50,12 +54,16 @@
                     placeholder="Default value 2 weeks"
                     v-on="on"
                     clearable
-                  ></v-text-field>
+                  />
                 </template>
                 <v-date-picker v-model="expDate" no-title scrollable>
                   <v-spacer></v-spacer>
-                  <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-                  <v-btn text color="primary" @click="$refs.menu.save(expDate)">OK</v-btn>
+                  <v-btn text color="primary" @click="menu = false"
+                    >Cancel</v-btn
+                  >
+                  <v-btn text color="primary" @click="$refs.menu.save(expDate)"
+                    >OK</v-btn
+                  >
                 </v-date-picker>
               </v-menu>
             </v-col>
@@ -79,10 +87,8 @@ export default {
       title: "",
       message: "",
       expDate: "",
-      desk: { title: "local", _id: "local", local: true },
+      desk: {},
       titleRules: [v => !!v || "Title is required"],
-
-      //TODO: Need to implement Local Desk
       deskRules: [v => !!v || "Desk is required yet"]
     };
   },
@@ -118,13 +124,11 @@ export default {
   },
   computed: {
     deskList() {
-      return [
-        { title: "local", _id: "local", local: true },
-        ...this.$store.getters["desk/getList"].map(el => ({
+      return this.$store.getters["desk/getList"].map(el => ({
           _id: el._id,
-          title: el.title
-        }))
-      ];
+          title: el.title,
+          local: !!el.local
+        }));
     }
   }
 };

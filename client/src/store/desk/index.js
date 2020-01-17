@@ -4,14 +4,16 @@ import Vue from "vue";
 const desk = {
   namespaced: true,
   state: {
-    list: []
+    initialData: [{ title: 'Local', _id: 'local', local: true }],
+    list: [{ title: 'Local', _id: 'local', local: true }]
   },
   mutations: {
     clearList(state) {
-      Vue.set(state, "list", []);
+      Vue.set(state, "list", state.initialData);
     },
     getDesks(state, desks) {
-      Vue.set(state, "list", desks);
+      let list = [...state.list, ...desks]
+      Vue.set(state, "list", list);
     },
     createDesk(state, desk) {
       state.list.push(desk);
@@ -26,27 +28,29 @@ const desk = {
       Vue.set(state, "list", list);
     },
     updateDeskLocal(state, options) {
-      let { methode, task } = options;
+      let { method, task } = options;
 
-      if (methode == "create") {
-        state.list.find(el => el._id == task.desk).tasks.push(task._id);
+      if (method === "create") {
+        console.log('task:', task)
+        console.log(state.list.find(el => el._id === task.desk))
+        state.list.find(el => el._id === task.desk).tasks.push(task._id);
       }
-      if (methode == "delete") {
-        let deskIndex = state.list.findIndex(el => el._id == task.desk);
+      if (method === "delete") {
+        let deskIndex = state.list.findIndex(el => el._id === task.desk);
         let taskIndex = state.list[deskIndex].tasks.findIndex(
-          el => el._id == task._id
+          el => el._id === task._id
         );
         state.list[deskIndex].tasks.splice(taskIndex, 1);
       }
-      if (methode == "update") {
-        let newDeskIndex = state.list.findIndex(el => el._id == task.desk);
+      if (method === "update") {
+        let newDeskIndex = state.list.findIndex(el => el._id === task.desk);
 
         if (!state.list[newDeskIndex].tasks.includes(task._id)) {
           let oldDeskIndex = state.list.findIndex(el =>
-            el.tasks.some(el => el == task._id)
+            el.tasks.some(el => el === task._id)
           );
           let oldTaskIndex = state.list[oldDeskIndex].tasks.findIndex(
-            el => el == task._id
+            el => el === task._id
           );
           state.list[oldDeskIndex].tasks.splice(oldTaskIndex, 1);
           state.list[newDeskIndex].tasks.push(task._id);
@@ -57,7 +61,8 @@ const desk = {
   actions: {
     //Get Desk List
     //Get /api/desks/
-    async getList({ commit }) {
+    async getList({ commit, rootGetters }) {
+      console.log(rootGetters['user/isLoggedIn'])
       commit("clearError", null, { root: true });
       commit("setLoading", null, { root: true });
       try {

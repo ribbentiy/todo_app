@@ -26,9 +26,7 @@
     <v-content>
       <v-container fluid>
         <v-row>
-          <v-col cols="12" xl="4" md="6" sm="6" class="board">
-            <Desk :desk="localDesk" />
-          </v-col>
+
           <v-col
             v-for="(item, index) in deskList"
             :key="index"
@@ -65,23 +63,17 @@ export default {
     Drawer
   },
   mounted() {
-    if (this.$store.getters["user/isLoggedIn"]) {
-      this.$store
+    this.$store
         .dispatch("desk/getList")
-        .then(this.$store.dispatch("task/getList"));
-    }
+        .then(() => this.$store.dispatch("task/getList"))
+        .then(() => this.$store.dispatch('task/getLocalTasks'))
   },
   computed: {
     deskList() {
       return this.$store.getters["desk/getList"];
     },
-    localDesk() {
-      return {
-        title: "Local Desk",
-        local: true,
-        tasks: this.$store.getters["task/getLocalList"].map(el => el._id)
-      };
-    }
+
+
   }
 };
 </script>

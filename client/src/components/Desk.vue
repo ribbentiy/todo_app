@@ -9,7 +9,7 @@
           :key="task._id"
           :task_id="task._id"
           :desk_id="desk._id"
-        ></li>
+        />
       </ul>
       <!-- <v-btn color="error" @click.stop="delDesk(desk._id)">Delete</v-btn> -->
     </v-card-text>
@@ -29,15 +29,16 @@ export default {
   },
   props: ["desk"],
   methods: {
-    delDesk(id) {
-      this.$store.dispatch("desk/deleteDesk", id);
-    }
+    // delDesk(id) {
+    //   this.$store.dispatch("desk/deleteDesk", id);
+    // }
   },
   computed: {
     taskList() {
-      if (!this.desk.local) {
+      if (this.desk._id !== 'local') {
         return this.$store.getters["task/getList"](this.desk._id);
       }
+      console.log(this.$store.getters["task/getLocalList"])
       return this.$store.getters["task/getLocalList"];
     }
   }

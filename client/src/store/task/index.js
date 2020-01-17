@@ -1,10 +1,6 @@
 import axios from "axios";
 import Vue from "vue";
-import Dexie from "dexie";
-const db = new Dexie("LocalDesk");
-db.version(1).stores({
-  tasks: "++_id, title, message, expDate, createdAt, isDone, desk"
-});
+import db from '../../plugins/localDb'
 
 const task = {
   namespaced: true,
@@ -14,7 +10,7 @@ const task = {
   },
   mutations: {
     getTasks(state, tasks) {
-      let list = sortTasks(tasks);
+      let list = sortTasks([...state.list, ...tasks]);
       Vue.set(state, "list", list);
     },
     createTask(state, task) {
@@ -48,7 +44,9 @@ const task = {
       Vue.set(state, "localList", list);
     },
     clearList(state) {
-      Vue.set(state, "list", []);
+      let list = state.list.filter(el => el.desk === 'local')
+      Vue.set(state, 'list', list)
+
     }
   },
   actions: {
@@ -62,13 +60,25 @@ const task = {
     },
     async createTask({ commit }, task) {
       try {
-        let res = await axios.post("/api/tasks", task);
-        commit("createTask", res.data);
-        commit(
-          "desk/updateDeskLocal",
-          { methode: "create", task: res.data },
-          { root: true }
-        );
+        if (task.desk !== 'local') {
+          let res = await axios.post("/api/tasks", task);
+          commit("createTask", res.data);
+          commit(
+            "desk/updateDeskLocal",
+            { method: "create", task: res.data },
+            { root: true }
+          );
+        } else {
+          task.createdAt = new Date( Date.now()).toISOString()
+          let res = await db.tasks.add(task);
+          let newtask = await db.tasks.get(res);
+          commit('addLocalTask', newtask);
+          commit(
+            "desk/updateDeskLocal",
+            { method: "create", task: newtask },
+            { root: true }
+          );
+        }
       } catch (err) {
         console.error(err);
       }
@@ -79,7 +89,7 @@ const task = {
         commit("updateTask", res.data);
         commit(
           "desk/updateDeskLocal",
-          { methode: "update", task: res.data },
+          { method: "update", task: res.data },
           { root: true }
         );
       } catch (err) {
@@ -92,7 +102,7 @@ const task = {
         commit("deleteTask", task._id);
         commit(
           "desk/updateDeskLocal",
-          { methode: "delete", task },
+          { method: "delete", task },
           { root: true }
         );
       } catch (err) {
@@ -101,22 +111,22 @@ const task = {
     },
     async getLocalTasks({ commit }) {
       try {
-        let res = await db.tasks.get();
-        console.log(res);
-        commit("getLocalTasks", res);
+        let res = await db.tasks.toArray();
+        console.log('res: ', res);
+        commit("getTasks", res);
       } catch (error) {
         console.log(error);
       }
     },
-    async addLocalTask({ commit }, task) {
-      try {
-        let res = await db.tasks.add({ task });
-        console.log(res);
-        commit("addLocalTask", res);
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    // async addLocalTask({ commit }, task) {
+    //   try {
+    //     let res = await db.tasks.add({ task });
+    //     console.log(res);
+    //     commit("addLocalTask", res);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
     async updateLocalTask({ commit }, { id, ...payload }) {
       try {
         let res = await db.tasks.update(id, payload);
@@ -149,7 +159,7 @@ function sortTasks(tasks) {
         let aTime = new Date(a.createdAt).getTime();
         let bTime = new Date(b.createdAt).getTime();
 
-        return aTime - bTime;
+        return bTime - aTime;
       } else {
         return a.isDone - b.isDone;
       }
