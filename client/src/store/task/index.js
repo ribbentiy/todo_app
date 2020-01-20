@@ -1,12 +1,11 @@
 import axios from "axios";
 import Vue from "vue";
-import db from '../../plugins/localDb'
+import db from "../../plugins/localDb";
 
 const task = {
   namespaced: true,
   state: {
-    list: [],
-    localList: []
+    list: []
   },
   mutations: {
     getTasks(state, tasks) {
@@ -26,129 +25,121 @@ const task = {
       let list = state.list.filter(el => el._id !== task_id);
       Vue.set(state, "list", list);
     },
-    getLocalTasks(state, tasks) {
-      let list = sortTasks(tasks);
-      Vue.set(state, "localList", list);
-    },
-    addLocalTask(state, task) {
-      state.localList.unshift(task);
-    },
-    updateLocalTask(state, task) {
-      let list = state.localList.filter(el => el._id !== task.id);
-      list.push(task);
-      list = sortTasks(list);
-      Vue.set(state, "localList", list);
-    },
-    deleteLocalTask(state, task_id) {
-      let list = state.localList.filter(el => el._id !== task_id);
-      Vue.set(state, "localList", list);
-    },
     clearList(state) {
-      let list = state.list.filter(el => el.desk === 'local')
-      Vue.set(state, 'list', list)
-
+      let list = state.list.filter(el => el.desk === "local");
+      Vue.set(state, "list", list);
     }
   },
   actions: {
-    async getList({ commit }) {
+    async getList({ commit, rootGetters }) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
-        let res = await axios.get("/api/tasks");
-        commit("getTasks", res.data);
+        let res = [];
+        if (rootGetters["user/isLoggedIn"]) {
+          res = (await axios.get("/api/tasks")).data;
+        }
+        let resLocal = await db.tasks.toArray();
+        res = [...res, ...resLocal];
+        commit("getTasks", res);
       } catch (error) {
-        console.error(error);
+        commit("setError", error, { root: true });
+      } finally {
+        commit("clearLoading", null, { root: true });
       }
     },
     async createTask({ commit }, task) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
-        if (task.desk !== 'local') {
-          let res = await axios.post("/api/tasks", task);
-          commit("createTask", res.data);
+        let res = {};
+        if (task.desk !== "local") {
+          res = (await axios.post("/api/tasks", task)).data;
           commit(
             "desk/updateDeskLocal",
-            { method: "create", task: res.data },
+            { method: "create", task: res },
             { root: true }
           );
         } else {
-          task.createdAt = new Date( Date.now()).toISOString()
-          let res = await db.tasks.add(task);
-          let newtask = await db.tasks.get(res);
-          commit('addLocalTask', newtask);
-          commit(
-            "desk/updateDeskLocal",
-            { method: "create", task: newtask },
-            { root: true }
-          );
+          if (!task.createdAt) {
+            task.createdAt = new Date(Date.now()).toISOString();
+          }
+          if (!task.expDate) {
+            task.expDate = new Date(
+              Date.now() + 14 * 24 * 60 * 60 * 1000
+            ).toISOString();
+          }
+          let id = await db.tasks.add(task);
+          res = await db.tasks.get(id);
         }
-      } catch (err) {
-        console.error(err);
+        commit("createTask", res);
+      } catch (error) {
+        console.error(error);
+        commit("setError", error, { root: true });
+      } finally {
+        commit("clearLoading", null, { root: true });
       }
     },
-    async updateTask({ commit }, task) {
+    async updateTask({ commit, dispatch }, task) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
-        let res = await axios.put(`/api/tasks/${task._id}`, task);
-        commit("updateTask", res.data);
-        commit(
-          "desk/updateDeskLocal",
-          { method: "update", task: res.data },
-          { root: true }
-        );
-      } catch (err) {
-        console.error(err);
+        let res = {};
+        let isDeskNotChange = !task.oldDesk;
+        let isNewDeskNotLocal = task.desk !== "local";
+        let isOldDeskNotLocal = task.oldDesk !== "local";
+        if (isDeskNotChange || (isNewDeskNotLocal && isOldDeskNotLocal)) {
+          if (task.desk !== "local") {
+            res = (await axios.put(`/api/tasks/${task._id}`, task)).data;
+            task.oldDesk ? (res.oldDesk = task.oldDesk) : undefined;
+            commit(
+              "desk/updateDeskLocal",
+              { method: "update", task: res },
+              { root: true }
+            );
+          } else {
+            let { _id, ...payload } = task;
+            await db.tasks.update(_id, payload);
+            res = await db.tasks.get(_id);
+          }
+          commit("updateTask", res);
+        } else {
+          let { _id, oldDesk, ...payload } = task;
+          dispatch("createTask", payload);
+          dispatch("deleteTask", { _id, desk: oldDesk });
+        }
+      } catch (error) {
+        console.error(error);
+        commit("setError", error, { root: true });
+      } finally {
+        commit("clearLoading", null, { root: true });
       }
     },
     async deleteTask({ commit }, task) {
+      commit("clearError", null, { root: true });
+      commit("setLoading", null, { root: true });
       try {
-        await axios.delete(`/api/tasks/${task._id}`);
+        if (task.desk !== "local") {
+          await axios.delete(`/api/tasks/${task._id}`);
+          commit(
+            "desk/updateDeskLocal",
+            { method: "delete", task },
+            { root: true }
+          );
+        } else {
+          await db.tasks.delete(task._id);
+        }
         commit("deleteTask", task._id);
-        commit(
-          "desk/updateDeskLocal",
-          { method: "delete", task },
-          { root: true }
-        );
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    async getLocalTasks({ commit }) {
-      try {
-        let res = await db.tasks.toArray();
-        console.log('res: ', res);
-        commit("getTasks", res);
       } catch (error) {
-        console.log(error);
-      }
-    },
-    // async addLocalTask({ commit }, task) {
-    //   try {
-    //     let res = await db.tasks.add({ task });
-    //     console.log(res);
-    //     commit("addLocalTask", res);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    async updateLocalTask({ commit }, { id, ...payload }) {
-      try {
-        let res = await db.tasks.update(id, payload);
-        console.log(res);
-        commit("updateLocalTask", res);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async deleteLocalTask({ commit }, id) {
-      try {
-        await db.tasks.delete(id);
-        commit("deleteLocalTask", id);
-      } catch (error) {
-        console.error(error);
+        commit("setError", error, { root: true });
+      } finally {
+        commit("clearLoading", null, { root: true });
       }
     }
   },
   getters: {
     getList: state => desk_id => state.list.filter(el => el.desk === desk_id),
-    getTask: state => id => state.list.find(el => el._id === id),
-    getLocalList: state => state.localList
+    getTask: state => id => state.list.find(el => el._id === id)
   }
 };
 

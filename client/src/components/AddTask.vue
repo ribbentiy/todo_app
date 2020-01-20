@@ -36,6 +36,8 @@
                 :rules="deskRules"
                 required
               />
+            </v-col>
+            <v-col cols="12" sm="6">
               <v-menu
                 ref="menu"
                 v-model="menu"
@@ -57,7 +59,7 @@
                   />
                 </template>
                 <v-date-picker v-model="expDate" no-title scrollable>
-                  <v-spacer></v-spacer>
+                  <v-spacer />
                   <v-btn text color="primary" @click="menu = false"
                     >Cancel</v-btn
                   >
@@ -71,9 +73,12 @@
         </v-container>
       </v-form>
     </v-card-text>
+    <v-divider />
     <v-card-actions>
-      <v-btn color="success" @click.prevent="addTask">Submit</v-btn>
-      <v-btn color="warning" @click.prevent="cancelAdding">Cancel</v-btn>
+      <v-btn color="secondary" @click="$refs.form.reset()">Clear</v-btn>
+      <v-btn color="secondary" @click="closeModal">Cancel</v-btn>
+      <v-spacer />
+      <v-btn color="success" :disabled="!form" @click="addTask">Submit</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -92,15 +97,6 @@ export default {
       deskRules: [v => !!v || "Desk is required yet"]
     };
   },
-
-  mounted() {
-    //this.expDate = new Date(Date.now()).toISOString().substr(0, 10);
-    if (this.$store.getters["user/isLoggedIn"]) {
-      console.log("user is logged in");
-    } else {
-      console.log("user is not logged in");
-    }
-  },
   methods: {
     addTask() {
       let task = {
@@ -115,20 +111,20 @@ export default {
       }
       this.$store
         .dispatch("task/createTask", task)
-        .then(() => this.cancelAdding());
+        .then(() => this.closeModal());
     },
-    cancelAdding() {
+    closeModal() {
       this.$refs.form.reset();
-      this.$emit("cancelAdding");
+      this.$emit("closeModal");
     }
   },
   computed: {
     deskList() {
       return this.$store.getters["desk/getList"].map(el => ({
-          _id: el._id,
-          title: el.title,
-          local: !!el.local
-        }));
+        _id: el._id,
+        title: el.title,
+        local: !!el.local
+      }));
     }
   }
 };

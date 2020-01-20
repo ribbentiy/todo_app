@@ -35,11 +35,7 @@ export default {
   },
   computed: {
     taskList() {
-      if (this.desk._id !== 'local') {
-        return this.$store.getters["task/getList"](this.desk._id);
-      }
-      console.log(this.$store.getters["task/getLocalList"])
-      return this.$store.getters["task/getLocalList"];
+      return this.$store.getters["task/getList"](this.desk._id);
     }
   }
 };

@@ -8,28 +8,30 @@
           v-model="email"
           :rules="[rules.email, rules.required]"
           type="email"
-        ></v-text-field>
+          lazy-validation
+        />
         <v-text-field
           label="Password"
           v-model="password"
           counter="6"
           :rules="[rules.required, rules.length(4)]"
           type="password"
-        ></v-text-field>
+          lazy-validation
+        />
         <v-text-field
           v-if="signIn"
           label="Confirm Password"
           type="password"
           :rules="[rules.required, rules.isEqual(password)]"
-        ></v-text-field>
-        <v-switch v-model="signIn" inset label="SignIn?"></v-switch>
+        />
+        <v-switch v-model="signIn" inset label="SignIn?" />
       </v-form>
     </v-card-text>
-    <v-divider></v-divider>
+    <v-divider />
     <v-card-actions>
       <v-btn color="secondary" @click="$refs.form.reset()">Clear</v-btn>
       <v-btn color="secondary" @click="closeModal">Cancel</v-btn>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-btn color="success" :disabled="!form" @click="submitForm"
         >Submit</v-btn
       >

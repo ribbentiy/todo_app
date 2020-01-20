@@ -4,20 +4,36 @@
       <Drawer />
     </v-navigation-drawer>
     <v-app-bar app clipped-left>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>{{ this.$route.name }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn color="info" @click.stop="dialog = true">Add Task</v-btn>
+      <v-spacer />
+      <v-btn
+        color="info"
+        @click.stop="addDeskDialog = true"
+        v-if="isLoggedIn"
+        class="mr-4"
+        >Add Desk</v-btn
+      >
       <v-dialog
-        v-model="dialog"
+        v-model="addDeskDialog"
         scrollable
-        persistent
+        max-width="500px"
+        transition="dialog-transition"
+      >
+        <v-container>
+          <AddDesk @closeModal="addDeskDialog = false" />
+        </v-container>
+      </v-dialog>
+      <v-btn color="info" @click.stop="addTaskDialog = true">Add Task</v-btn>
+      <v-dialog
+        v-model="addTaskDialog"
+        scrollable
         max-width="500px"
         transition="dialog-transition"
       >
         <v-container>
           <v-row>
-            <AddTask @cancelAdding="dialog = false" />
+            <AddTask @closeModal="addTaskDialog = false" />
           </v-row>
         </v-container>
       </v-dialog>
@@ -26,7 +42,6 @@
     <v-content>
       <v-container fluid>
         <v-row>
-
           <v-col
             v-for="(item, index) in deskList"
             :key="index"
@@ -48,32 +63,36 @@
 import Desk from "../components/Desk";
 import AddTask from "../components/AddTask";
 import Drawer from "../components/Drawer";
+import AddDesk from "../components/AddDesk";
 
 export default {
   data() {
     return {
       drawer: null,
-      dialog: false
+      addTaskDialog: false,
+      addDeskDialog: false
     };
   },
   name: "home",
   components: {
     Desk,
     AddTask,
-    Drawer
+    Drawer,
+    AddDesk
   },
   mounted() {
     this.$store
-        .dispatch("desk/getList")
-        .then(() => this.$store.dispatch("task/getList"))
-        .then(() => this.$store.dispatch('task/getLocalTasks'))
+      .dispatch("desk/getList")
+      .then(() => this.$store.dispatch("task/getList"));
   },
+
   computed: {
     deskList() {
       return this.$store.getters["desk/getList"];
     },
-
-
+    isLoggedIn() {
+      return this.$store.getters["user/isLoggedIn"];
+    }
   }
 };
 </script>

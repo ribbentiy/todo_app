@@ -6,4 +6,4 @@ db.version(1).stores({
   desks: "++_id, title, tasks"
 });
 
-export default db
+export default db;

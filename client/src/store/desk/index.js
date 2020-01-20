@@ -4,15 +4,15 @@ import Vue from "vue";
 const desk = {
   namespaced: true,
   state: {
-    initialData: [{ title: 'Local', _id: 'local', local: true }],
-    list: [{ title: 'Local', _id: 'local', local: true }]
+    initialData: [{ title: "Local", _id: "local", local: true }],
+    list: [{ title: "Local", _id: "local", local: true }]
   },
   mutations: {
     clearList(state) {
       Vue.set(state, "list", state.initialData);
     },
     getDesks(state, desks) {
-      let list = [...state.list, ...desks]
+      let list = [...state.list, ...desks];
       Vue.set(state, "list", list);
     },
     createDesk(state, desk) {
@@ -31,8 +31,6 @@ const desk = {
       let { method, task } = options;
 
       if (method === "create") {
-        console.log('task:', task)
-        console.log(state.list.find(el => el._id === task.desk))
         state.list.find(el => el._id === task.desk).tasks.push(task._id);
       }
       if (method === "delete") {
@@ -44,10 +42,9 @@ const desk = {
       }
       if (method === "update") {
         let newDeskIndex = state.list.findIndex(el => el._id === task.desk);
-
-        if (!state.list[newDeskIndex].tasks.includes(task._id)) {
-          let oldDeskIndex = state.list.findIndex(el =>
-            el.tasks.some(el => el === task._id)
+        if (task.oldDesk) {
+          let oldDeskIndex = state.list.findIndex(
+            el => el._id === task.oldDesk
           );
           let oldTaskIndex = state.list[oldDeskIndex].tasks.findIndex(
             el => el === task._id
@@ -62,13 +59,16 @@ const desk = {
     //Get Desk List
     //Get /api/desks/
     async getList({ commit, rootGetters }) {
-      console.log(rootGetters['user/isLoggedIn'])
       commit("clearError", null, { root: true });
       commit("setLoading", null, { root: true });
       try {
-        let res = await axios.get("/api/desks");
+        let res = [];
+        if (rootGetters["user/isLoggedIn"]) {
+          res = (await axios.get("/api/desks")).data;
+        }
         commit("clearLoading", null, { root: true });
-        commit("getDesks", res.data);
+        commit("clearList");
+        commit("getDesks", res);
       } catch (err) {
         commit("setError", err, { root: true });
       }

@@ -1,10 +1,16 @@
 <template>
-  <v-card class="card" :color="isDone ? 'green lighten-4' : late ? 'red lighten-4' : ''">
+  <v-card
+    class="card"
+    :color="isDone ? 'green lighten-4' : late ? 'red lighten-4' : ''"
+  >
     <v-card-title @click="expanded = !expanded">{{ task.title }}</v-card-title>
 
     <v-card-text v-show="expanded">
       <p>{{ task.message }}</p>
-      <v-checkbox :label="isDone ? 'Done': 'Not done'" v-model="isDone"></v-checkbox>
+      <v-checkbox
+        :label="isDone ? 'Done' : 'Not done'"
+        v-model="isDone"
+      ></v-checkbox>
 
       <p>
         Expiration in:
@@ -12,7 +18,7 @@
       </p>
     </v-card-text>
     <v-card-actions v-show="expanded">
-      <v-btn color="info" fab x-small @click.stop="dialog = true">
+      <v-btn color="info" fab x-small class="mr-2" @click.stop="dialog = true">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
       <v-dialog
@@ -99,7 +105,8 @@ export default {
       set(e) {
         this.$store.dispatch("task/updateTask", {
           _id: this.task_id,
-          isDone: e
+          isDone: e,
+          desk: this.desk_id
         });
       }
     }
