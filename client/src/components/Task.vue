@@ -10,7 +10,7 @@
       <v-checkbox
         :label="isDone ? 'Done' : 'Not done'"
         v-model="isDone"
-      ></v-checkbox>
+      />
 
       <p>
         Expiration in:

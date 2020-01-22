@@ -46,8 +46,8 @@
             v-for="(item, index) in deskList"
             :key="index"
             cols="12"
-            xl="4"
-            md="6"
+            xl="3"
+            md="4"
             sm="6"
             class="board"
           >

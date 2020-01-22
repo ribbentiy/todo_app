@@ -146,14 +146,9 @@ const task = {
 function sortTasks(tasks) {
   if (tasks.length > 1) {
     tasks = tasks.sort((a, b) => {
-      if ((a.isDone && b.isDone) || (!a.isDone && !b.isDone)) {
-        let aTime = new Date(a.createdAt).getTime();
-        let bTime = new Date(b.createdAt).getTime();
-
-        return bTime - aTime;
-      } else {
-        return a.isDone - b.isDone;
-      }
+      let aTime = new Date(a.createdAt).getTime();
+      let bTime = new Date(b.createdAt).getTime();
+      return bTime - aTime;
     });
   }
   return tasks;

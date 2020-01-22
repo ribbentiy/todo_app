@@ -37,6 +37,7 @@
 </template>
 
 <script>
+  //TODO Need to implemend proper validation in profile
 export default {
   name: "Profile",
   data() {

@@ -13,7 +13,7 @@
         <v-text-field
           label="Password"
           v-model="password"
-          counter="6"
+          counter="4"
           :rules="[rules.required, rules.length(4)]"
           type="password"
           lazy-validation
@@ -42,7 +42,7 @@
 <script>
 import isEmail from "validator/es/lib/isEmail";
 import equals from "validator/es/lib/equals";
-
+// TODO Change counter and password length validation to 6
 export default {
   name: "LoginForm",
 
