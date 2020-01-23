@@ -24,31 +24,29 @@
           <AddDesk @closeModal="addDeskDialog = false" />
         </v-container>
       </v-dialog>
-      <v-btn color="info" @click.stop="addTaskDialog = true">Add Task</v-btn>
+      <v-btn
+        color="info"
+        @click.stop="addTaskDialog = true"
+        :open="addDeskDialog"
+        >Add Task</v-btn
+      >
       <v-dialog
         v-model="addTaskDialog"
         scrollable
         max-width="500px"
         transition="dialog-transition"
       >
-        <v-container>
-          <v-row>
-            <AddTask @closeModal="addTaskDialog = false" />
-          </v-row>
-        </v-container>
+        <AddTask @closeModal="addTaskDialog = false" />
       </v-dialog>
     </v-app-bar>
 
     <v-content>
-      <v-container fluid>
-        <v-row>
+      <v-container fluid  class="content-wrap">
+        <v-row class="container-inner">
           <v-col
             v-for="(item, index) in deskList"
             :key="index"
-            cols="12"
-            xl="3"
-            md="4"
-            sm="6"
+
             class="board"
           >
             <Desk :desk="item" />
@@ -85,7 +83,7 @@ export default {
       .dispatch("desk/getList")
       .then(() => this.$store.dispatch("task/getList"));
   },
-
+  methods: {},
   computed: {
     deskList() {
       return this.$store.getters["desk/getList"];
@@ -98,8 +96,21 @@ export default {
 </script>
 
 <style>
-/* .board {
-  height: 100vh;
-  overflow: auto;
-} */
+  .container-inner {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: auto;
+    justify-content: space-between;
+    height: calc(100vh - 88px);
+  }
+
+  .board {
+    min-width: 350px;
+  }
+
+  .content-wrap {
+    box-sizing: border-box;
+
+  }
+
 </style>

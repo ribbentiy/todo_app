@@ -7,10 +7,7 @@
 
     <v-card-text v-show="expanded">
       <p>{{ task.message }}</p>
-      <v-checkbox
-        :label="isDone ? 'Done' : 'Not done'"
-        v-model="isDone"
-      />
+      <v-checkbox :label="isDone ? 'Done' : 'Not done'" v-model="isDone" />
 
       <p>
         Expiration in:
@@ -86,6 +83,7 @@ export default {
       }
     },
     late() {
+
       return (
         !this.isDone &&
         Math.floor(

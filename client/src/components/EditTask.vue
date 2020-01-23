@@ -110,7 +110,6 @@ export default {
     const { title, message, isDone, expDate } = this.$store.getters[
       "task/getTask"
     ](this.task_id);
-    console.log(this.$store.getters["task/getTask"](this.task_id));
     this.title = title;
     this.message = message;
     this.expDate = new Date(expDate).toISOString().substr(0, 10);
@@ -143,7 +142,6 @@ export default {
         expDate: this.expDate
       };
       if (this.desk_id !== task.desk) {
-        console.log(this.desk_id === task.desk);
         task.oldDesk = this.desk_id;
       }
       await this.$store.dispatch("task/updateTask", task);

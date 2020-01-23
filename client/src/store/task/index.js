@@ -5,10 +5,13 @@ import db from "../../plugins/localDb";
 const task = {
   namespaced: true,
   state: {
+    startDragDesk: '',
+    stopDragDesk: '',
     list: []
   },
   mutations: {
     getTasks(state, tasks) {
+      state.list = [];
       let list = sortTasks([...state.list, ...tasks]);
       Vue.set(state, "list", list);
     },
@@ -25,9 +28,23 @@ const task = {
       let list = state.list.filter(el => el._id !== task_id);
       Vue.set(state, "list", list);
     },
+    sortTasks(state) {
+      let list = sortTasks(state.list);
+      Vue.set(state, "list", list)
+    },
     clearList(state) {
       let list = state.list.filter(el => el.desk === "local");
       Vue.set(state, "list", list);
+    },
+    setStartDragDesk(state, desk_id) {
+      state.startDragDesk = desk_id
+    },
+    setStopDragDesk(state, desk_id) {
+      state.stopDragDesk = desk_id
+    },
+    clearDragDesks(state) {
+      state.startDragDesk = '';
+      state.stopDragDesk = ''
     }
   },
   actions: {
@@ -90,6 +107,7 @@ const task = {
         let isOldDeskNotLocal = task.oldDesk !== "local";
         if (isDeskNotChange || (isNewDeskNotLocal && isOldDeskNotLocal)) {
           if (task.desk !== "local") {
+
             res = (await axios.put(`/api/tasks/${task._id}`, task)).data;
             task.oldDesk ? (res.oldDesk = task.oldDesk) : undefined;
             commit(
@@ -135,11 +153,21 @@ const task = {
       } finally {
         commit("clearLoading", null, { root: true });
       }
+    },
+    async draggingTask({state, commit, dispatch}, task) {
+      if (state.startDragDesk !== state.stopDragDesk) {
+        task.desk = state.stopDragDesk;
+        task.oldDesk = state.startDragDesk
+        await dispatch('updateTask', task)
+      } else {
+        commit('sortTasks')
+      }
+      commit('clearDragDesks')
     }
   },
   getters: {
     getList: state => desk_id => state.list.filter(el => el.desk === desk_id),
-    getTask: state => id => state.list.find(el => el._id === id)
+    getTask: state => id => state.list.find(el => el._id.toString() === id.toString())
   }
 };
 

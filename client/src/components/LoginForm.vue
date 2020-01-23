@@ -15,13 +15,17 @@
           v-model="password"
           counter="4"
           :rules="[rules.required, rules.length(4)]"
-          type="password"
+          :append-icon="TogglePass_1 ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="TogglePass_1 ? 'text' : 'password'"
+          @click:append="TogglePass_1 = !TogglePass_1"
           lazy-validation
         />
         <v-text-field
           v-if="signIn"
           label="Confirm Password"
-          type="password"
+          :append-icon="TogglePass_1 ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="TogglePass_1 ? 'text' : 'password'"
+          @click:append="TogglePass_1 = !TogglePass_1"
           :rules="[rules.required, rules.isEqual(password)]"
         />
         <v-switch v-model="signIn" inset label="SignIn?" />
@@ -47,6 +51,7 @@ export default {
   name: "LoginForm",
 
   data: () => ({
+    TogglePass_1: false,
     email: "",
     password: "",
     confirmPassword: "",

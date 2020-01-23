@@ -3,8 +3,7 @@ import Vue from "vue";
 
 const desk = {
   namespaced: true,
-  state: {
-    initialData: [{ title: "Local", _id: "local", local: true }],
+  state: {initialData: [{ title: "Local", _id: "local", local: true }],
     list: [{ title: "Local", _id: "local", local: true }]
   },
   mutations: {

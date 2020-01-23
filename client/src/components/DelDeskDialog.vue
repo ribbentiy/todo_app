@@ -2,7 +2,8 @@
   <v-card>
     <v-card-title primary-title>Delete Desk</v-card-title>
     <v-card-text>
-      This action cannot be undone. This will permanently delete the <strong>{{desk.title}}</strong> desk
+      This action cannot be undone. This will permanently delete the
+      <strong>{{ desk.title }}</strong> desk
       <v-form ref="form" v-model="form">
         <v-text-field
           label="Desk name"
@@ -11,7 +12,6 @@
           lazy-validation
           required
           clearable
-
         />
       </v-form>
     </v-card-text>
@@ -20,39 +20,38 @@
       <v-btn color="secondary" @click="$refs.form.reset()">Clear</v-btn>
       <v-btn color="secondary" @click="closeModal">Cancel</v-btn>
       <v-spacer />
-      <v-btn color="error dark darker-4" :disabled="!form" @click="deleteDesk">Delete anyway</v-btn>
+      <v-btn color="error dark darker-4" :disabled="!form" @click="deleteDesk"
+        >Delete anyway</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
-  import equals from "validator/es/lib/equals";
+import equals from "validator/es/lib/equals";
 
-  export default {
-    name: "DelDeskDialog",
-    props: ['desk'],
-    data() {
-      return {
-        form: false,
-        delRules:[
-          v => !!v || 'Desk title is required',
-          v => equals(v || "", this.desk.title) || "Incorrect Desk Title"
-        ]
-      }
+export default {
+  name: "DelDeskDialog",
+  props: ["desk"],
+  data() {
+    return {
+      form: false,
+      delRules: [
+        v => !!v || "Desk title is required",
+        v => equals(v || "", this.desk.title) || "Incorrect Desk Title"
+      ]
+    };
+  },
+  methods: {
+    closeModal() {
+      this.$refs.form.reset();
+      this.$emit("closeModal");
     },
-    methods: {
-      closeModal() {
-        console.log(this.$refs)
-        this.$refs.form.reset()
-        this.$emit('closeModal')
-      },
-      deleteDesk() {
-        this.$store.dispatch('desk/deleteDesk', this.desk._id)
-      }
+    deleteDesk() {
+      this.$store.dispatch("desk/deleteDesk", this.desk._id);
     }
   }
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

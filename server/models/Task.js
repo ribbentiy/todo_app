@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const timestamp = require("mongoose-timestamp");
 
 const TaskSchema = new mongoose.Schema({
   title: {
@@ -27,7 +26,17 @@ const TaskSchema = new mongoose.Schema({
   desk: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Desk"
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
+
+
 
   // group: {
   //   type: mongoose.Schema.Types.ObjectId,
@@ -35,6 +44,11 @@ const TaskSchema = new mongoose.Schema({
   // }
 });
 
-TaskSchema.plugin(timestamp);
+
+TaskSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  return next();
+});
+
 
 module.exports = Task = mongoose.model("Task", TaskSchema);

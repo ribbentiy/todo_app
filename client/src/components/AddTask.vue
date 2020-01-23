@@ -1,6 +1,8 @@
 <template>
   <v-card>
-    <v-card-title primary-title>Add Task</v-card-title>
+    <v-card-title primary-title
+      >Add Task{{ desk._id ? ` into ${desk.title} Desk` : "" }}</v-card-title
+    >
     <v-card-text>
       <v-form ref="form" v-model="form">
         <v-container>
@@ -24,10 +26,10 @@
                 clearable
               />
             </v-col>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="6" v-if="!desk._id">
               <v-select
                 :items="deskList"
-                v-model="desk"
+                v-model="deskData"
                 label="Select Desk"
                 item-text="title"
                 item-value="_id"
@@ -85,6 +87,16 @@
 
 <script>
 export default {
+  props: {
+    desk: {
+      default() {
+        return {};
+      }
+    },
+    open: {
+      type: Boolean
+    }
+  },
   data() {
     return {
       form: false,
@@ -92,20 +104,20 @@ export default {
       title: "",
       message: "",
       expDate: "",
-      desk: {},
+      deskData: this.desk,
       titleRules: [v => !!v || "Title is required"],
       deskRules: [v => !!v || "Desk is required yet"]
     };
   },
+
   methods: {
     addTask() {
       let task = {
         title: this.title,
         message: this.message,
         isDone: false,
-        desk: this.desk._id
+        desk: this.deskData._id
       };
-
       if (this.expDate) {
         task.expDate = this.expDate;
       }
@@ -115,6 +127,9 @@ export default {
     },
     closeModal() {
       this.$refs.form.reset();
+      if (this.desk._id) {
+        this.deskData = this.desk;
+      }
       this.$emit("closeModal");
     }
   },
