@@ -123,8 +123,8 @@ const task = {
           commit("updateTask", res);
         } else {
           let { _id, oldDesk, ...payload } = task;
-          dispatch("createTask", payload);
           dispatch("deleteTask", { _id, desk: oldDesk });
+          dispatch("createTask", payload);
         }
       } catch (error) {
         console.error(error);

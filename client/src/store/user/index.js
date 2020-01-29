@@ -34,7 +34,7 @@ const user = {
   actions: {
     // register user
     // post /register
-    async reqisterUser({ commit }, { email, password }) {
+    async registerUser({ commit }, { email, password }) {
       try {
         const res = await axios.post("/api/user/register", {
           email,
